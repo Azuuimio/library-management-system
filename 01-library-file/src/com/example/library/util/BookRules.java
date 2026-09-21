@@ -17,16 +17,16 @@ public class BookRules {
         }
         String normalized = value.strip();
         if (normalized.length() > MAX_TEXT_LENGTH) {
-            throw new BusinessException(lable + "最多 " + MAX_TEXT_LENGTH + " 个字符")
+            throw new BusinessException(lable + "最多 " + MAX_TEXT_LENGTH + " 个字符");
         }
         return normalized;
     }
 
     public static BigDecimal price(BigDecimal price) {
         if (price == null || price.signum() < 0  || price.compareTo(MAX_PRICE) > 0) {
-            throw new BusinessException("价格须在 0.00 ~ " + MAX_PRICE + " 之间");
+            throw new BusinessException("价格须在 0.00 ~ " + MAX_PRICE.toPlainString() + " 之间");
         }
-        if (price.scale > 2) {
+        if (price.scale() > 2) {
             throw new BusinessException("价格最多两位小数");
         }
         return price.setScale(2, RoundingMode.UNNECESSARY);
