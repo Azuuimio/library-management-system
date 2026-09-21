@@ -1,4 +1,4 @@
 package com.example.library.model;
 
-public record User(long id, String name, Role role) {
+public record User(long id, String username, Role role) {
 }

@@ -2,7 +2,7 @@ package com.example.library.model;
 
 import java.time.LocalDateTime;
 
-public record BorrowRecord(long id, long bookId, long readerId,
+public record BorrowRecord(long id, long userId, long bookId,
                            LocalDateTime borrowedAt, LocalDateTime returnedAt) {
     public boolean isreturned() {
         return returnedAt != null;
