@@ -11,9 +11,9 @@ public interface BookDao {
 
     List<Book> findAllActive();
 
-    List<Book> findActiveByTitle(String kerword);
+    List<Book> findActiveByTitle(String keyword);
 
-    Book insert(String book, String author, BigDecimal price, int totalQuantity);
+    Book insert(String title, String author, BigDecimal price, int totalQuantity);
 
     void update(Book book);
 }
