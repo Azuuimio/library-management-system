@@ -1,4 +1,4 @@
 package com.example.library.model;
 
-public record BorrowView(BorrowRecord record, String username, String bookTitle, boolean bookDeleted) {
+public record BorrowView(Borrow record, String username, String bookTitle, boolean bookDeleted) {
 }

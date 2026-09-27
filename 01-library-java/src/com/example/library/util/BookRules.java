@@ -5,19 +5,19 @@ import com.example.library.exception.BusinessException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class BookRules {
+public final class BookRules {
     public static final int MAX_TEXT_LENGTH = 200;
     public static final BigDecimal MAX_PRICE = new BigDecimal("99999.99");
 
     private BookRules() {}
 
-    public static String text(String value, String lable) {
+    public static String text(String value, String label) {
         if (value == null || value.isBlank()) {
-            throw new BusinessException(lable + "不能为空");
+            throw new BusinessException(label + "不能为空");
         }
         String normalized = value.strip();
-        if (normalized.length() > MAX_TEXT_LENGTH) {
-            throw new BusinessException(lable + "最多 " + MAX_TEXT_LENGTH + " 个字符");
+        if (normalized.codePointCount(0, normalized.length()) > MAX_TEXT_LENGTH) {
+            throw new BusinessException(label + "最多 " + MAX_TEXT_LENGTH + " 个字符");
         }
         return normalized;
     }
