@@ -9,9 +9,9 @@ import java.util.Optional;
 public interface BookDao {
     Optional<Book> findById(long id);
 
-    List<Book> findAllActive();
+    List<Book> findAllNotDeleted();
 
-    List<Book> findActiveByTitle(String keyword);
+    List<Book> findNotDeletedByTitle(String keyword);
 
     Book insert(String title, String author, BigDecimal price, int totalQuantity);
 

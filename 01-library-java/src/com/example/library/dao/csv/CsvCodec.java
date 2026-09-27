@@ -1,20 +1,18 @@
-package com.example.library.dao.impl.csv;
+package com.example.library.dao.csv;
 
 import com.example.library.exception.StorageException;
 
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class CsvCodec {
+final class CsvCodec {
     private CsvCodec() {
     }
 
-    public static List<List<String>> read(Reader source) throws IOException {
+    static List<List<String>> read(Reader source) throws IOException {
         PushbackReader reader = new PushbackReader(source, 1);
         List<List<String>> rows = new ArrayList<>();
         List<String> row = new ArrayList<>();
@@ -80,34 +78,26 @@ public final class CsvCodec {
         return List.copyOf(rows);
     }
 
-    public static String encode(List<List<String>> rows) {
-        StringWriter writer = new StringWriter();
-        try {
-            write(writer, rows);
-        } catch (IOException exception) {
-            throw new IllegalStateException("内存 CSV 编码失败", exception);
-        }
-        return writer.toString();
-    }
-
-    public static void write(Writer writer, List<List<String>> rows) throws IOException {
+    static String encode(List<List<String>> rows) {
+        StringBuilder result = new StringBuilder();
         for (List<String> row : rows) {
             for (int index = 0; index < row.size(); index++) {
                 if (index > 0) {
-                    writer.write(',');
+                    result.append(',');
                 }
                 String value = row.get(index);
                 boolean quote = value.indexOf(',') >= 0 || value.indexOf('"') >= 0
                         || value.indexOf('\r') >= 0 || value.indexOf('\n') >= 0;
                 if (quote) {
-                    writer.write('"');
-                    writer.write(value.replace("\"", "\"\""));
-                    writer.write('"');
+                    result.append('"');
+                    result.append(value.replace("\"", "\"\""));
+                    result.append('"');
                 } else {
-                    writer.write(value);
+                    result.append(value);
                 }
             }
-            writer.write("\r\n");
+            result.append("\r\n");
         }
+        return result.toString();
     }
 }

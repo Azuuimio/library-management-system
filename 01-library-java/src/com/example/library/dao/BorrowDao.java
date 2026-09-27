@@ -1,6 +1,5 @@
 package com.example.library.dao;
 
-import com.example.library.model.Book;
 import com.example.library.model.Borrow;
 
 import java.time.LocalDateTime;
@@ -14,9 +13,9 @@ public interface BorrowDao {
 
     List<Borrow> findByUserId(long userId);
 
-    long countActiveByBookId(long bookId);
+    long countUnreturnedByBookId(long bookId);
 
-    boolean existsActive(long userId, long bookId);
+    boolean existsUnreturned(long userId, long bookId);
 
     Borrow insert(long userId, long bookId, LocalDateTime borrowedAt);
 

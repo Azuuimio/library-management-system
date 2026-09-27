@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public final class BookRules {
-    public static final int MAX_TEXT_LENGTH = 200;
-    public static final BigDecimal MAX_PRICE = new BigDecimal("99999.99");
+    private static final int MAX_TEXT_LENGTH = 200;
+    private static final BigDecimal MAX_PRICE = new BigDecimal("99999.99");
 
     private BookRules() {}
 
