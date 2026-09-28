@@ -12,7 +12,7 @@ final class CsvCodec {
     private CsvCodec() {
     }
 
-    static List<List<String>> read(Reader source) throws IOException {
+    static List<List<String>> decode(Reader source) throws IOException {
         PushbackReader reader = new PushbackReader(source, 1);
         List<List<String>> rows = new ArrayList<>();
         List<String> row = new ArrayList<>();

@@ -1,15 +1,15 @@
-package com.example.library.util;
+package com.example.library.validation;
 
 import com.example.library.exception.BusinessException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public final class BookRules {
+public final class BookValidator {
     private static final int MAX_TEXT_LENGTH = 200;
     private static final BigDecimal MAX_PRICE = new BigDecimal("99999.99");
 
-    private BookRules() {}
+    private BookValidator() {}
 
     public static String text(String value, String label) {
         if (value == null || value.isBlank()) {
