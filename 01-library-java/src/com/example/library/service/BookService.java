@@ -27,7 +27,7 @@ public final class BookService {
     }
 
     public void delete(long bookId) {
-        Book book = requireNotDeleted(bookId);
+        Book book = findNotDeletedById(bookId);
         if (borrowRecordDao.countUnreturnedByBookId(bookId) != 0) {
             throw new BusinessException("该图书仍有未归还记录，不能删除");
         }
@@ -36,7 +36,7 @@ public final class BookService {
 
     public void update(long bookId, String title, String author,
                        BigDecimal price, int totalQuantity) {
-        Book current = requireNotDeleted(bookId);
+        Book current = findNotDeletedById(bookId);
         Book replacement = new Book(current.id(), BookValidator.text(title, "书名"),
                 BookValidator.text(author, "作者"), BookValidator.price(price), BookValidator.quantity(totalQuantity), false);
         if (replacement.totalQuantity() < borrowRecordDao.countUnreturnedByBookId(bookId)) {
@@ -45,22 +45,22 @@ public final class BookService {
         bookDao.update(replacement);
     }
 
-    public BookView get(long bookId) {
-        return toView(requireNotDeleted(bookId));
-    }
-
-    public List<BookView> search(String keyword) {
-        if (keyword == null) {
-            throw new BusinessException("查询关键词不能为 null");
-        }
-        return bookDao.findNotDeletedByTitle(keyword.strip()).stream().map(this::toView).toList();
+    public BookView findById(long bookId) {
+        return toView(findNotDeletedById(bookId));
     }
 
     public List<BookView> findAll() {
         return bookDao.findAllNotDeleted().stream().map(this::toView).toList();
     }
 
-    private Book requireNotDeleted(Long bookId) {
+    public List<BookView> findByTitle(String keyword) {
+        if (keyword == null) {
+            throw new BusinessException("查询关键词不能为 null");
+        }
+        return bookDao.findNotDeletedByTitle(keyword.strip()).stream().map(this::toView).toList();
+    }
+
+    private Book findNotDeletedById(Long bookId) {
         return bookDao.findById(bookId).filter(book -> !book.deleted())
                 .orElseThrow(() -> new BusinessException("图书不存在或已删除"));
     }
