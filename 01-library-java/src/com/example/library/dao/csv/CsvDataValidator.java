@@ -7,7 +7,6 @@ import com.example.library.model.Role;
 import com.example.library.model.User;
 import com.example.library.validation.BookValidator;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,7 +32,7 @@ public final class CsvDataValidator {
                 BookValidator.price(book.price());
                 BookValidator.quantity(book.totalQuantity());
             }
-            Map<Long, Long> borrowedCounts = new HashMap<>();
+            Map<Long, Long> unreturnedCounts = new HashMap<>();
             Set<String> activePairs = new HashSet<>();
             for (BorrowRecord record : borrowRecordDao.records.values()) {
                 User user = userDao.users.get(record.userId());
@@ -49,10 +48,10 @@ public final class CsvDataValidator {
                 } else {
                     check(!book.deleted(), "已删除图书仍有未归还记录");
                     check(activePairs.add(record.userId() + ":" + record.bookId()), "同一读者重复借阅未归还");
-                    borrowedCounts.merge(record.bookId(), 1L, Long::sum);
+                    unreturnedCounts.merge(record.bookId(), 1L, Long::sum);
                 }
             }
-            for (Map.Entry<Long, Long> entry : borrowedCounts.entrySet()) {
+            for (Map.Entry<Long, Long> entry : unreturnedCounts.entrySet()) {
                 check(entry.getValue() <= bookDao.books.get(entry.getKey()).totalQuantity(), "未归还数量超过总数量");
             }
         } catch (RuntimeException exception) {
