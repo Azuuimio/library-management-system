@@ -23,7 +23,7 @@ public final class BookValidator {
      * @param value 待校验的书名或作者
      * @param label 错误提示中使用的字段名称，例如“书名”
      * @return 去除首尾空白后的文本
-     * @throws BusinessException 文本为 {@code null}、仅包含空白，或去除首尾空白后超过长度限制
+     * @throws BusinessException 文本为 {@code null}、空字符串或仅包含空白字符，或去除首尾空白后超过长度限制
      */
     public static String validateAndNormalizeText(String value, String label) {
         if (value == null || value.isBlank()) {

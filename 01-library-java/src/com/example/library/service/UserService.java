@@ -19,7 +19,7 @@ public final class UserService {
      *
      * @param username 用户输入的账号名称，匹配时区分大小写
      * @return 登录成功的用户，包含编号和角色
-     * @throws BusinessException 账号为 {@code null}、仅包含空白，或对应用户不存在
+     * @throws BusinessException 账号为 {@code null}、空字符串或仅包含空白字符，或对应用户不存在
      */
     public User login(String username) {
         if (username == null || username.isBlank()) {

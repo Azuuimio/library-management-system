@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * 在首次运行时创建三个 CSV 文件，并写入预制账号。
+ * 当三个数据文件均不存在时，创建 CSV 文件并写入预制账号。
  */
 public final class CsvInitializer {
     private CsvInitializer() {
