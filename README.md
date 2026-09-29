@@ -6,7 +6,7 @@
 
 | 阶段 | 目录 | 新增技术 |
 | :--- | :--- | :--- |
-| 01 | 01-library-java | 纯 Java（控制台 + CSV 存储） |
+| 01 | 01-library-java | 纯 Java SE |
 | 02 | 02-library-jdbc-mysql | JDBC + MySQL |
 | 03 | 03-library-mybatis | MyBatis |
 | 04 | 04-library-mybatis-plus | MyBatis-Plus |
