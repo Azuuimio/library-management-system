@@ -31,7 +31,7 @@ public class CsvBookDao implements BookDao {
                         Integer.parseInt(row.get(4)),
                         parseDeletedFlag(row.get(5))));
             } catch (RuntimeException exception) {
-                throw CsvFileIO.invalidRow(file, i, exception);
+                throw CsvFileIO.invalidRowException(file, i, exception);
             }
         }
     }

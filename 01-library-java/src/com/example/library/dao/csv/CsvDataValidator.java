@@ -37,13 +37,13 @@ public final class CsvDataValidator {
             for (BorrowRecord record : borrowRecordDao.records.values()) {
                 User user = userDao.users.get(record.userId());
                 Book book = bookDao.books.get(record.bookId());
-                check(user != null && user.role() == Role.READER, "借阅记录关联的读者不存在");
+                check(user != null && user.role() == Role.READER, "借阅记录关联的用户不存在或不是读者");
                 check(book != null, "借阅记录关联的图书不存在");
                 check(record.borrowedAt() != null && record.borrowedAt().getNano() == 0,
-                        "时间须为非空的整秒时间");
+                        "借阅时间须为非空的整秒时间");
                 if (record.isReturned()) {
                     check(record.returnedAt().getNano() == 0,
-                            "时间须为非空的整秒时间");
+                            "归还时间须为整秒时间");
                     check(!record.returnedAt().isBefore(record.borrowedAt()), "归还时间早于借阅时间");
                 } else {
                     check(!book.deleted(), "已删除图书仍有未归还记录");

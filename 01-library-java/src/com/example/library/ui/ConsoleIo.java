@@ -30,7 +30,7 @@ public class ConsoleIo {
         try {
             String line = input.readLine();
             if (line == null) {
-                throw new EndOfInput();
+                throw new EndOfInputException();
             }
             return line;
         } catch (IOException exception) {
@@ -59,8 +59,10 @@ public class ConsoleIo {
             }
             try {
                 return BookValidator.validateQuantity(Integer.parseInt(text));
-            } catch (NumberFormatException | BusinessException exception) {
+            } catch (NumberFormatException exception) {
                 println("请输入 0 到 " + Integer.MAX_VALUE + " 之间的整数。");
+            } catch (BusinessException exception) {
+                println(exception.getMessage());
             }
         }
     }
@@ -81,14 +83,14 @@ public class ConsoleIo {
         }
     }
 
-    public String readText(String prompt, String defaultValue) {
+    public String readText(String prompt, String label, String defaultValue) {
         while (true) {
             String text = readLine(prompt).strip();
             if (text.isEmpty() && defaultValue != null) {
                 return defaultValue;
             }
             try {
-                return BookValidator.validateAndNormalizeText(text, "内容");
+                return BookValidator.validateAndNormalizeText(text, label);
             } catch (BusinessException exception) {
                 println(exception.getMessage());
             }
@@ -99,10 +101,10 @@ public class ConsoleIo {
         return readLine(prompt + "（输入 y 确认，其他输入取消）：").strip().equalsIgnoreCase("y");
     }
 
-    static final class EndOfInput extends RuntimeException {
+    static final class EndOfInputException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        EndOfInput() {
+        EndOfInputException() {
         }
     }
 }

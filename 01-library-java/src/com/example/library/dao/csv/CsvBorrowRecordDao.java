@@ -30,7 +30,7 @@ public class CsvBorrowRecordDao implements BorrowRecordDao {
                         LocalDateTime.parse(row.get(3)),
                         row.get(4).isEmpty() ? null : LocalDateTime.parse(row.get(4))));
             } catch (RuntimeException exception) {
-                throw CsvFileIO.invalidRow(file, i, exception);
+                throw CsvFileIO.invalidRowException(file, i, exception);
             }
         }
     }
