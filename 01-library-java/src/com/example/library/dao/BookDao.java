@@ -11,7 +11,7 @@ public interface BookDao {
 
     List<Book> findAllNotDeleted();
 
-    List<Book> findNotDeletedByTitle(String keyword);
+    List<Book> searchNotDeletedByTitle(String keyword);
 
     Book insert(String title, String author, BigDecimal price, int totalQuantity);
 

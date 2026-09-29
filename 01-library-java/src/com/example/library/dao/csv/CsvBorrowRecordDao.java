@@ -7,7 +7,11 @@ import com.example.library.model.BorrowRecord;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NavigableMap;
+import java.util.Optional;
+import java.util.TreeMap;
 
 public class CsvBorrowRecordDao implements BorrowRecordDao {
     static final List<String> HEADER = List.of("id", "userId", "bookId", "borrowedAt", "returnedAt");
@@ -20,7 +24,7 @@ public class CsvBorrowRecordDao implements BorrowRecordDao {
         for (int i = 0; i < rows.size(); i++) {
             List<String> row = rows.get(i);
             try {
-                put(new BorrowRecord(Long.parseLong(row.get(0)),
+                addLoadedRecord(new BorrowRecord(Long.parseLong(row.get(0)),
                         Long.parseLong(row.get(1)),
                         Long.parseLong(row.get(2)),
                         LocalDateTime.parse(row.get(3)),
@@ -73,7 +77,7 @@ public class CsvBorrowRecordDao implements BorrowRecordDao {
         save(record);
     }
 
-    private void put(BorrowRecord value) {
+    private void addLoadedRecord(BorrowRecord value) {
         if (value.id() <= 0 || records.putIfAbsent(value.id(), value) != null) {
             throw new IllegalArgumentException("编号必须为不重复的正整数");
         }
@@ -97,7 +101,9 @@ public class CsvBorrowRecordDao implements BorrowRecordDao {
                     Long.toString(value.userId()),
                     Long.toString(value.bookId()),
                     value.borrowedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                    value.returnedAt() == null ? "" : value.returnedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+                    value.returnedAt() == null
+                            ? ""
+                            : value.returnedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
         }
         CsvFileIO.write(file, rows);
         records = copy;

@@ -6,7 +6,12 @@ import com.example.library.model.Book;
 
 import java.math.BigDecimal;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.NavigableMap;
+import java.util.Optional;
+import java.util.TreeMap;
 
 public class CsvBookDao implements BookDao {
     static final List<String> HEADER = List.of("id", "title", "author", "price", "totalQuantity", "deleted");
@@ -19,12 +24,12 @@ public class CsvBookDao implements BookDao {
         for (int i = 0; i < rows.size(); i++) {
             List<String> row = rows.get(i);
             try {
-                put(new Book(Long.parseLong(row.get(0)),
+                addLoadedBook(new Book(Long.parseLong(row.get(0)),
                         row.get(1),
                         row.get(2),
                         new BigDecimal(row.get(3)),
                         Integer.parseInt(row.get(4)),
-                        bool(row.get(5))));
+                        parseDeletedFlag(row.get(5))));
             } catch (RuntimeException exception) {
                 throw CsvFileIO.invalidRow(file, i, exception);
             }
@@ -42,10 +47,12 @@ public class CsvBookDao implements BookDao {
     }
 
     @Override
-    public List<Book> findNotDeletedByTitle(String keyword) {
+    public List<Book> searchNotDeletedByTitle(String keyword) {
         String normalized = keyword.toLowerCase(Locale.ROOT);
-        return books.values().stream().filter(book -> !book.deleted()).
-                filter(book -> book.title().toLowerCase(Locale.ROOT).contains(keyword)).toList();
+        return books.values().stream()
+                .filter(book -> !book.deleted())
+                .filter(book -> book.title().toLowerCase(Locale.ROOT).contains(normalized))
+                .toList();
     }
 
     @Override
@@ -63,13 +70,13 @@ public class CsvBookDao implements BookDao {
         save(book);
     }
 
-    private void put(Book value) {
-        if (value.id() <=  0 || books.putIfAbsent(value.id(),  value) != null) {
+    private void addLoadedBook(Book value) {
+        if (value.id() <= 0 || books.putIfAbsent(value.id(), value) != null) {
             throw new IllegalArgumentException("编号必须为不重复的正整数");
         }
     }
 
-    private boolean bool(String text) {
+    private boolean parseDeletedFlag(String text) {
         if (!text.equals("true") && !text.equals("false")) {
             throw new IllegalArgumentException("deleted 只能是 true 或 false");
         }

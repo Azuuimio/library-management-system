@@ -3,15 +3,19 @@ package com.example.library.ui;
 import com.example.library.exception.BusinessException;
 import com.example.library.validation.BookValidator;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 
-public class ConsoleIO {
+public class ConsoleIo {
     private final BufferedReader input;
     private final PrintWriter output;
 
-    public ConsoleIO() {
+    public ConsoleIo() {
         input = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
         output = new PrintWriter(System.out, true, StandardCharsets.UTF_8);
     }
@@ -20,7 +24,7 @@ public class ConsoleIO {
         output.println(text);
     }
 
-    public String line(String prompt) {
+    public String readLine(String prompt) {
         output.print(prompt);
         output.flush();
         try {
@@ -34,40 +38,41 @@ public class ConsoleIO {
         }
     }
 
-    public long id(String prompt) {
+    public long readId(String prompt) {
         while (true) {
             try {
-                long id = Long.parseLong(line(prompt).strip());
+                long id = Long.parseLong(readLine(prompt).strip());
                 if (id > 0) {
                     return id;
                 }
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException ignored) {
+            }
             println("请输入有效的正整数编号。");
         }
     }
 
-    public int quantity(String prompt, Integer defaultValue) {
+    public int readQuantity(String prompt, Integer defaultValue) {
         while (true) {
-            String text = line(prompt).strip();
+            String text = readLine(prompt).strip();
             if (text.isEmpty() && defaultValue != null) {
                 return defaultValue;
             }
             try {
-                return BookValidator.quantity(Integer.parseInt(text));
+                return BookValidator.validateQuantity(Integer.parseInt(text));
             } catch (NumberFormatException | BusinessException exception) {
                 println("请输入 0 到 " + Integer.MAX_VALUE + " 之间的整数。");
             }
         }
     }
 
-    public BigDecimal price(String prompt, BigDecimal defaultValue) {
+    public BigDecimal readPrice(String prompt, BigDecimal defaultValue) {
         while (true) {
-            String text = line(prompt).strip();
+            String text = readLine(prompt).strip();
             if (text.isEmpty() && defaultValue != null) {
                 return defaultValue;
             }
             try {
-                return BookValidator.price(new BigDecimal(text));
+                return BookValidator.validateAndNormalizePrice(new BigDecimal(text));
             } catch (NumberFormatException exception) {
                 println("请输入有效金额。");
             } catch (BusinessException exception) {
@@ -76,27 +81,28 @@ public class ConsoleIO {
         }
     }
 
-    public String text(String prompt, String defaultValue) {
+    public String readText(String prompt, String defaultValue) {
         while (true) {
-            String text = line(prompt).strip();
+            String text = readLine(prompt).strip();
             if (text.isEmpty() && defaultValue != null) {
                 return defaultValue;
             }
             try {
-                return BookValidator.text(text, "内容");
+                return BookValidator.validateAndNormalizeText(text, "内容");
             } catch (BusinessException exception) {
                 println(exception.getMessage());
             }
         }
     }
 
-
     public boolean confirm(String prompt) {
-        return line(prompt + "（输入 y 确认，其他输入取消）：").strip().equalsIgnoreCase("y");
+        return readLine(prompt + "（输入 y 确认，其他输入取消）：").strip().equalsIgnoreCase("y");
     }
 
     static final class EndOfInput extends RuntimeException {
         private static final long serialVersionUID = 1L;
-        EndOfInput() {}
+
+        EndOfInput() {
+        }
     }
 }

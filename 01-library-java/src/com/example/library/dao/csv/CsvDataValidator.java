@@ -23,14 +23,14 @@ public final class CsvDataValidator {
             Set<String> usernames = new HashSet<>();
             for (User user : userDao.users.values()) {
                 check(!user.username().isBlank() && user.username().equals(user.username().strip())
-                        && user.username().length() <= 50, "用户名格式无效");
+                        && user.username().codePointCount(0, user.username().length()) <= 50, "用户名格式无效");
                 check(usernames.add(user.username()), "用户名重复");
             }
             for (Book book : bookDao.books.values()) {
-                check(BookValidator.text(book.title(), "书名").equals(book.title()), "书名首尾不能有空白");
-                check(BookValidator.text(book.author(), "作者").equals(book.author()), "作者首尾不能有空白");
-                BookValidator.price(book.price());
-                BookValidator.quantity(book.totalQuantity());
+                check(BookValidator.validateAndNormalizeText(book.title(), "书名").equals(book.title()), "书名首尾不能有空白");
+                check(BookValidator.validateAndNormalizeText(book.author(), "作者").equals(book.author()), "作者首尾不能有空白");
+                BookValidator.validateAndNormalizePrice(book.price());
+                BookValidator.validateQuantity(book.totalQuantity());
             }
             Map<Long, Long> unreturnedCounts = new HashMap<>();
             Set<String> activePairs = new HashSet<>();
@@ -42,7 +42,7 @@ public final class CsvDataValidator {
                 check(record.borrowedAt() != null && record.borrowedAt().getNano() == 0,
                         "时间须为非空的整秒时间");
                 if (record.isReturned()) {
-                    check(record.returnedAt() != null && record.returnedAt().getNano() == 0,
+                    check(record.returnedAt().getNano() == 0,
                             "时间须为非空的整秒时间");
                     check(!record.returnedAt().isBefore(record.borrowedAt()), "归还时间早于借阅时间");
                 } else {

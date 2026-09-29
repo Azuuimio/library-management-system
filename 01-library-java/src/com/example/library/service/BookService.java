@@ -20,10 +20,10 @@ public final class BookService {
     }
 
     public Book add(String title, String author, BigDecimal price, int totalQuantity) {
-        return bookDao.insert(BookValidator.text(title, "书名"),
-                BookValidator.text(author, "作者"),
-                BookValidator.price(price),
-                BookValidator.quantity(totalQuantity));
+        return bookDao.insert(BookValidator.validateAndNormalizeText(title, "书名"),
+                BookValidator.validateAndNormalizeText(author, "作者"),
+                BookValidator.validateAndNormalizePrice(price),
+                BookValidator.validateQuantity(totalQuantity));
     }
 
     public void delete(long bookId) {
@@ -37,8 +37,12 @@ public final class BookService {
     public void update(long bookId, String title, String author,
                        BigDecimal price, int totalQuantity) {
         Book current = findNotDeletedById(bookId);
-        Book replacement = new Book(current.id(), BookValidator.text(title, "书名"),
-                BookValidator.text(author, "作者"), BookValidator.price(price), BookValidator.quantity(totalQuantity), false);
+        Book replacement = new Book(current.id(),
+                BookValidator.validateAndNormalizeText(title, "书名"),
+                BookValidator.validateAndNormalizeText(author, "作者"),
+                BookValidator.validateAndNormalizePrice(price),
+                BookValidator.validateQuantity(totalQuantity),
+                false);
         if (replacement.totalQuantity() < borrowRecordDao.countUnreturnedByBookId(bookId)) {
             throw new BusinessException("总数量不能小于当前未归还数量");
         }
@@ -49,18 +53,18 @@ public final class BookService {
         return toView(findNotDeletedById(bookId));
     }
 
-    public List<BookView> findAll() {
+    public List<BookView> findAllNotDeleted() {
         return bookDao.findAllNotDeleted().stream().map(this::toView).toList();
     }
 
-    public List<BookView> findByTitle(String keyword) {
+    public List<BookView> searchNotDeletedByTitle(String keyword) {
         if (keyword == null) {
             throw new BusinessException("查询关键词不能为 null");
         }
-        return bookDao.findNotDeletedByTitle(keyword.strip()).stream().map(this::toView).toList();
+        return bookDao.searchNotDeletedByTitle(keyword.strip()).stream().map(this::toView).toList();
     }
 
-    private Book findNotDeletedById(Long bookId) {
+    private Book findNotDeletedById(long bookId) {
         return bookDao.findById(bookId).filter(book -> !book.deleted())
                 .orElseThrow(() -> new BusinessException("图书不存在或已删除"));
     }

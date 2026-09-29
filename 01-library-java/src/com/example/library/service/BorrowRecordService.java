@@ -19,9 +19,9 @@ public class BorrowRecordService {
     private final BorrowRecordDao borrowRecordDao;
     private final UserDao userDao;
 
-    public BorrowRecordService(BookDao bookDao, BorrowRecordDao recordDao, UserDao userDao) {
+    public BorrowRecordService(BookDao bookDao, BorrowRecordDao borrowRecordDao, UserDao userDao) {
         this.bookDao = bookDao;
-        this.borrowRecordDao = recordDao;
+        this.borrowRecordDao = borrowRecordDao;
         this.userDao = userDao;
     }
 
@@ -59,8 +59,9 @@ public class BorrowRecordService {
     }
 
     private BorrowRecord findOwnedById(long recordId, long userId) {
-        return borrowRecordDao.findById(recordId).filter(borrowRecord -> borrowRecord.userId() == userId).
-                orElseThrow(() -> new BusinessException("借阅记录不存在或不属于当前读者"));
+        return borrowRecordDao.findById(recordId)
+                .filter(borrowRecord -> borrowRecord.userId() == userId)
+                .orElseThrow(() -> new BusinessException("借阅记录不存在或不属于当前读者"));
     }
 
     private BorrowRecordView toView(BorrowRecord record) {
