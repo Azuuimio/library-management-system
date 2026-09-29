@@ -33,13 +33,10 @@ public class ConsoleUi {
         try {
             while (true) {
                 io.println("""
-                        
-                        
                         ==== 菜单·登录 ====
                           1. 登录
                           0. 退出
-                        ==================
-                        """);
+                        ==================""");
                 switch (readChoice(1)) {
                     case 0 -> {
                         io.println("再见！");
@@ -74,8 +71,6 @@ public class ConsoleUi {
             int choice;
             if (admin) {
                 io.println("""
-                        
-                        
                         === 菜单·管理员 ===
                           1. 添加图书
                           2. 删除图书
@@ -88,8 +83,6 @@ public class ConsoleUi {
                 choice = readChoice(6);
             } else {
                 io.println("""
-                        
-                        
                         ==== 菜单·读者 ====
                           1. 查询图书
                           2. 借阅图书
@@ -118,8 +111,8 @@ public class ConsoleUi {
             case 2 -> deleteBook();
             case 3 -> updateBook();
             case 4 -> search();
-            case 5 -> listBooks();
-            case 6 -> listAllRecords();
+            case 5 -> listAllBooks();
+            case 6 -> listAllBorrowRecords();
         }
     }
 
@@ -128,7 +121,7 @@ public class ConsoleUi {
             case 1 -> search();
             case 2 -> borrowBook(currentUser);
             case 3 -> returnBook(currentUser);
-            case 4 -> listMyRecords(currentUser);
+            case 4 -> listMyBorrowRecords(currentUser);
         }
     }
 
@@ -226,7 +219,7 @@ public class ConsoleUi {
         }
     }
 
-    private void listBooks() {
+    private void listAllBooks() {
         io.println("—— 全部图书 ——");
         try {
             showBooks(bookService.findAll());
@@ -235,19 +228,19 @@ public class ConsoleUi {
         }
     }
 
-    private void listAllRecords() {
+    private void listAllBorrowRecords() {
         io.println("—— 全部借阅 ——");
         try {
-            showRecords(borrowService.findAll());
+            showBorrowRecords(borrowService.findAll());
         } catch (BusinessException exception) {
             io.println("查询失败：" + exception.getMessage());
         }
     }
 
-    private void listMyRecords(User currentUser) {
-        io.println("\n—— 我的借阅 ——");
+    private void listMyBorrowRecords(User currentUser) {
+        io.println("—— 我的借阅 ——");
         try {
-            showRecords(borrowService.findByUser(currentUser));
+            showBorrowRecords(borrowService.findByUser(currentUser));
         } catch (BusinessException exception) {
             io.println("查询失败：" + exception.getMessage());
         }
@@ -275,7 +268,7 @@ public class ConsoleUi {
                    + " | 可借：" + view.availableQuantity());
     }
 
-    private void showRecords(List<BorrowRecordView> records) {
+    private void showBorrowRecords(List<BorrowRecordView> records) {
         if (records.isEmpty()) {
             io.println("暂无借阅记录。");
             return;
