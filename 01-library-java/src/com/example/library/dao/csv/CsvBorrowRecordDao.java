@@ -13,11 +13,26 @@ import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.TreeMap;
 
+/**
+ * 使用 borrow_records.csv 保存借阅记录。
+ *
+ * <p>创建对象时读取文件，之后的查询使用内存中的数据。
+ * 每次新增或更新都重写全部记录，写入成功后再更新内存数据。
+ * 列表查询按记录编号升序返回不可修改的列表。
+ *
+ * <p>文件中的空归还时间对应 {@code null}，表示尚未归还。
+ */
 public class CsvBorrowRecordDao implements BorrowRecordDao {
     static final List<String> HEADER = List.of("id", "userId", "bookId", "borrowedAt", "returnedAt");
     private final Path file;
     NavigableMap<Long, BorrowRecord> records = new TreeMap<>();
 
+    /**
+     * 从指定目录读取 borrow_records.csv，按编号保存到内存中。
+     *
+     * @param directory 数据目录，其中的 borrow_records.csv 必须已存在
+     * @throws StorageException 读取失败、CSV 格式或字段转换失败，或记录编号不是正数或重复
+     */
     public CsvBorrowRecordDao(Path directory) {
         file = directory.toAbsolutePath().normalize().resolve("borrow_records.csv");
         List<List<String>> rows = CsvFileIO.read(file, HEADER);
@@ -83,6 +98,12 @@ public class CsvBorrowRecordDao implements BorrowRecordDao {
         }
     }
 
+    /**
+     * 取已有最大编号加一；没有借阅记录时从 1 开始。
+     *
+     * @return 新借阅记录编号
+     * @throws StorageException 最大编号已达到 {@link Long#MAX_VALUE}
+     */
     private long nextId() {
         try {
             return records.isEmpty() ? 1 : Math.addExact(records.lastKey(), 1);
@@ -91,6 +112,15 @@ public class CsvBorrowRecordDao implements BorrowRecordDao {
         }
     }
 
+    /**
+     * 将借阅记录加入数据副本，并用副本中的全部记录重写 CSV 文件。
+     *
+     * <p>时间以 ISO 本地日期时间格式保存，尚未归还的记录将归还时间写为空字段。
+     * 文件写入成功后才替换当前内存数据；写入抛出异常时，当前内存数据保持不变。
+     *
+     * @param record 要保存的记录；编号已存在时替换原记录
+     * @throws StorageException 写入 CSV 文件失败
+     */
     private void save(BorrowRecord record) {
         NavigableMap<Long, BorrowRecord> copy = new TreeMap<>(records);
         copy.put(record.id(), record);

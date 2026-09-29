@@ -13,11 +13,27 @@ import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.TreeMap;
 
+/**
+ * 使用 books.csv 保存图书数据。
+ *
+ * <p>创建对象时读取文件，之后的查询使用内存中的数据。
+ * 新增或修改图书时，将全部图书数据写回文件；写入成功后，再更新内存中的数据。
+ * 列表查询按图书编号升序返回不可修改的列表。
+ *
+ * <p>已删除的图书仍保留在文件中，用于查询历史借阅记录。
+ */
 public class CsvBookDao implements BookDao {
     static final List<String> HEADER = List.of("id", "title", "author", "price", "totalQuantity", "deleted");
     private final Path file;
     NavigableMap<Long, Book> books = new TreeMap<>();
 
+    /**
+     * 从指定目录读取 books.csv，按编号保存到内存中。
+     *
+     * @param directory 数据目录，其中的 books.csv 必须已存在
+     * @throws StorageException 读取失败、CSV 格式或字段转换失败、编号不是正数或重复，
+     *                          或删除标记不是小写的 {@code true} 或 {@code false}
+     */
     public CsvBookDao(Path directory) {
         file = directory.toAbsolutePath().normalize().resolve("books.csv");
         List<List<String>> rows = CsvFileIO.read(file, HEADER);
@@ -83,6 +99,12 @@ public class CsvBookDao implements BookDao {
         return Boolean.parseBoolean(text);
     }
 
+    /**
+     * 取已有最大编号加一；没有图书时从 1 开始，已删除图书也参与计算。
+     *
+     * @return 新图书编号
+     * @throws StorageException 最大编号已达到 {@link Long#MAX_VALUE}
+     */
     private long nextId() {
         try {
             return books.isEmpty() ? 1 : Math.addExact(books.lastKey(), 1);
@@ -91,6 +113,15 @@ public class CsvBookDao implements BookDao {
         }
     }
 
+    /**
+     * 将图书加入数据副本，并用副本中的全部图书重写 CSV 文件。
+     *
+     * <p>文件写入成功后，才用副本替换当前内存数据。
+     * 如果写入抛出异常，当前内存数据保持不变。
+     *
+     * @param book 要保存的图书；编号已存在时替换原图书
+     * @throws StorageException 写入 CSV 文件失败
+     */
     private void save(Book book) {
         NavigableMap<Long, Book> copy = new TreeMap<>(books);
         copy.put(book.id(), book);

@@ -15,6 +15,12 @@ import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * 显示登录菜单和角色菜单，将用户输入交给业务服务并展示结果。
+ *
+ * <p>管理员可以管理图书和查看全部借阅，读者可以查询图书、借还图书和查看本人借阅。
+ * 业务异常在对应操作中显示为失败提示；数据异常继续向程序入口传递。
+ */
 public class ConsoleUi {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
     private final ConsoleIo io;
@@ -30,6 +36,14 @@ public class ConsoleUi {
         this.borrowRecordService = borrowRecordService;
     }
 
+    /**
+     * 启动登录菜单，登录成功后进入对应角色的菜单。
+     *
+     * <p>退出登录后返回登录菜单；选择退出程序或输入流结束时，此方法返回。
+     *
+     * @throws com.example.library.exception.StorageException 操作中发生数据读写或关联错误
+     * @throws java.io.UncheckedIOException 读取控制台输入失败
+     */
     public void run() {
         try {
             io.println("欢迎使用图书管理系统");
@@ -162,6 +176,11 @@ public class ConsoleUi {
         }
     }
 
+    /**
+     * 展示图书当前信息并读取修改值，直接回车时保留对应字段的当前值。
+     *
+     * <p>数量输入代表总数量，最终由业务层检查其是否小于当前未归还数量。
+     */
     private void updateBook() {
         io.println("—— 修改图书 ——");
         try {
@@ -269,6 +288,14 @@ public class ConsoleUi {
         io.println("共 " + records.size() + " 条借阅记录。");
     }
 
+    /**
+     * 读取菜单编号，输入无效时持续提示并重新读取。
+     *
+     * @param max 当前菜单允许的最大编号，须为非负数
+     * @return 0 到最大编号之间的整数，包含两端
+     * @throws ConsoleIo.EndOfInputException 输入流已结束，无法继续读取
+     * @throws java.io.UncheckedIOException 读取控制台输入失败
+     */
     private int readChoice(int max) {
         while (true) {
             String choice = io.readLine("请选择功能：").strip();
@@ -287,6 +314,15 @@ public class ConsoleUi {
         io.readLine("按回车键继续……");
     }
 
+    /**
+     * 将文本中的控制字符转换为可见文字，避免书名等内容打断控制台显示。
+     *
+     * <p>换行、回车和制表符分别显示为 {@code \n}、{@code \r} 和 {@code \t}；
+     * 其他 ISO 控制字符显示为反斜杠、字母 u 和四位十六进制编码。
+     *
+     * @param text 要展示的文本，不能为 {@code null}，可以是空字符串
+     * @return 控制字符已替换的文本，其他字符保持不变
+     */
     private static String escapeControlChars(String text) {
         StringBuilder result = new StringBuilder();
         for (int offset = 0; offset < text.length();) {

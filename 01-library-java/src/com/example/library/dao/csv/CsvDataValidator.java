@@ -12,10 +12,33 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 在三个 CSV 文件加载后，检查用户、图书和借阅记录之间的数据一致性。
+ *
+ * <p>检查失败时抛出数据异常，由程序入口终止启动。
+ */
 public final class CsvDataValidator {
     private CsvDataValidator() {
     }
 
+    /**
+     * 检查已加载的数据是否满足账号、图书字段和借阅关联规则。
+     *
+     * <p>账号必须恰有一个管理员，用户名须唯一、无首尾空白且长度为 1 到 50 个 Unicode 码点。
+     * 图书字段须通过 {@link BookValidator} 校验，书名和作者不能有首尾空白。
+     *
+     * <p>借阅记录须关联存在的读者和图书，借阅时间不能为 {@code null} 且须精确到秒。
+     * 已填写的归还时间须精确到秒，且不能早于借阅时间。
+     * 未归还记录不能关联已删除图书，同一读者不能有同一本图书的多条未归还记录，
+     * 每本图书的未归还数量不能超过总数量。
+     *
+     * <p>此方法只检查数据，不修改字段或回写文件。
+     *
+     * @param userDao 已加载账号数据的 DAO
+     * @param bookDao 已加载图书数据的 DAO
+     * @param borrowRecordDao 已加载借阅数据的 DAO
+     * @throws StorageException 任一规则检查失败，或检查过程中出现运行时异常
+     */
     public static void validate(CsvUserDao userDao, CsvBookDao bookDao, CsvBorrowRecordDao borrowRecordDao) {
         try {
             check(userDao.users.values().stream().filter(user -> user.role() == Role.ADMIN).count() == 1,
