@@ -21,7 +21,7 @@ public final class CsvUserDao implements UserDao {
             List<String> row = rows.get(index);
             try {
                 long id = Long.parseLong(row.get(0));
-                put(new User(id, row.get(1), Role.valueOf(row.get(2))));
+                addLoadedUser(new User(id, row.get(1), Role.valueOf(row.get(2))));
             } catch (RuntimeException exception) {
                 throw CsvFileIO.invalidRow(file, index, exception);
             }
@@ -39,7 +39,7 @@ public final class CsvUserDao implements UserDao {
                 .filter(user -> user.username().equals(username)).findFirst();
     }
 
-    private void put(User value) {
+    private void addLoadedUser(User value) {
         if (value.id() <= 0 || users.putIfAbsent(value.id(), value) != null) {
             throw new IllegalArgumentException("编号必须为不重复的正整数");
         }
