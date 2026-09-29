@@ -20,7 +20,7 @@ import java.util.List;
  * <p>借还书通过新增或更新借阅记录反映，不修改图书总数量。
  * 调用方负责将借还操作限定为已登录读者，此类不检查用户角色。
  */
-public class BorrowRecordService {
+public final class BorrowRecordService {
     private final BookDao bookDao;
     private final BorrowRecordDao borrowRecordDao;
     private final UserDao userDao;

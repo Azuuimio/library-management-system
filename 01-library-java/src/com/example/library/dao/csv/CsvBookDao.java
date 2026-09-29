@@ -22,7 +22,7 @@ import java.util.TreeMap;
  *
  * <p>已删除的图书仍保留在文件中，用于查询历史借阅记录。
  */
-public class CsvBookDao implements BookDao {
+public final class CsvBookDao implements BookDao {
     static final List<String> HEADER = List.of("id", "title", "author", "price", "totalQuantity", "deleted");
     private final Path file;
     NavigableMap<Long, Book> books = new TreeMap<>();
@@ -36,7 +36,7 @@ public class CsvBookDao implements BookDao {
      */
     public CsvBookDao(Path directory) {
         file = directory.toAbsolutePath().normalize().resolve("books.csv");
-        List<List<String>> rows = CsvFileIO.read(file, HEADER);
+        List<List<String>> rows = CsvFileIo.read(file, HEADER);
         for (int i = 0; i < rows.size(); i++) {
             List<String> row = rows.get(i);
             try {
@@ -47,7 +47,7 @@ public class CsvBookDao implements BookDao {
                         Integer.parseInt(row.get(4)),
                         parseDeletedFlag(row.get(5))));
             } catch (RuntimeException exception) {
-                throw CsvFileIO.invalidRowException(file, i, exception);
+                throw CsvFileIo.invalidRowException(file, i, exception);
             }
         }
     }
@@ -135,7 +135,7 @@ public class CsvBookDao implements BookDao {
                     Integer.toString(value.totalQuantity()),
                     Boolean.toString(value.deleted())));
         }
-        CsvFileIO.write(file, rows);
+        CsvFileIo.write(file, rows);
         books = copy;
     }
 }

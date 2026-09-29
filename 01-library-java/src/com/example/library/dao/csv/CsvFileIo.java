@@ -19,8 +19,8 @@ import java.util.List;
  *
  * <p>读取时校验表头和列数；写入时先写同目录临时文件，再原子替换目标文件。
  */
-final class CsvFileIO {
-    private CsvFileIO() {
+final class CsvFileIo {
+    private CsvFileIo() {
     }
 
     /**
@@ -37,9 +37,9 @@ final class CsvFileIO {
             if (rows.isEmpty() || !rows.getFirst().equals(header)) {
                 throw new StorageException("表头错误，应为：" + String.join(",", header));
             }
-            for (int index = 1; index < rows.size(); index++) {
-                if (rows.get(index).size() != header.size()) {
-                    throw new StorageException("第 " + (index + 1) + " 条记录列数不匹配");
+            for (int i = 1; i < rows.size(); i++) {
+                if (rows.get(i).size() != header.size()) {
+                    throw new StorageException("第 " + (i + 1) + " 条记录列数不匹配");
                 }
             }
             return rows.subList(1, rows.size());

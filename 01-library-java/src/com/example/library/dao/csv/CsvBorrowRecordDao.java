@@ -22,7 +22,7 @@ import java.util.TreeMap;
  *
  * <p>文件中的空归还时间对应 {@code null}，表示尚未归还。
  */
-public class CsvBorrowRecordDao implements BorrowRecordDao {
+public final class CsvBorrowRecordDao implements BorrowRecordDao {
     static final List<String> HEADER = List.of("id", "userId", "bookId", "borrowedAt", "returnedAt");
     private final Path file;
     NavigableMap<Long, BorrowRecord> records = new TreeMap<>();
@@ -35,7 +35,7 @@ public class CsvBorrowRecordDao implements BorrowRecordDao {
      */
     public CsvBorrowRecordDao(Path directory) {
         file = directory.toAbsolutePath().normalize().resolve("borrow_records.csv");
-        List<List<String>> rows = CsvFileIO.read(file, HEADER);
+        List<List<String>> rows = CsvFileIo.read(file, HEADER);
         for (int i = 0; i < rows.size(); i++) {
             List<String> row = rows.get(i);
             try {
@@ -45,7 +45,7 @@ public class CsvBorrowRecordDao implements BorrowRecordDao {
                         LocalDateTime.parse(row.get(3)),
                         row.get(4).isEmpty() ? null : LocalDateTime.parse(row.get(4))));
             } catch (RuntimeException exception) {
-                throw CsvFileIO.invalidRowException(file, i, exception);
+                throw CsvFileIo.invalidRowException(file, i, exception);
             }
         }
     }
@@ -135,7 +135,7 @@ public class CsvBorrowRecordDao implements BorrowRecordDao {
                             ? ""
                             : value.returnedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
         }
-        CsvFileIO.write(file, rows);
+        CsvFileIo.write(file, rows);
         records = copy;
     }
 }

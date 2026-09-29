@@ -108,11 +108,11 @@ final class CsvCodec {
     static String encode(List<List<String>> rows) {
         StringBuilder result = new StringBuilder();
         for (List<String> row : rows) {
-            for (int index = 0; index < row.size(); index++) {
-                if (index > 0) {
+            for (int i = 0; i < row.size(); i++) {
+                if (i > 0) {
                     result.append(',');
                 }
-                String value = row.get(index);
+                String value = row.get(i);
                 boolean quote = value.indexOf(',') >= 0 || value.indexOf('"') >= 0
                         || value.indexOf('\r') >= 0 || value.indexOf('\n') >= 0;
                 if (quote) {

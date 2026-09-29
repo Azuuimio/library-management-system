@@ -28,14 +28,14 @@ public final class CsvUserDao implements UserDao {
      */
     public CsvUserDao(Path directory) {
         Path file = directory.toAbsolutePath().normalize().resolve("users.csv");
-        List<List<String>> rows = CsvFileIO.read(file, HEADER);
+        List<List<String>> rows = CsvFileIo.read(file, HEADER);
         for (int i = 0; i < rows.size(); i++) {
             List<String> row = rows.get(i);
             try {
                 long id = Long.parseLong(row.get(0));
                 addLoadedUser(new User(id, row.get(1), Role.valueOf(row.get(2))));
             } catch (RuntimeException exception) {
-                throw CsvFileIO.invalidRowException(file, i, exception);
+                throw CsvFileIo.invalidRowException(file, i, exception);
             }
         }
     }
