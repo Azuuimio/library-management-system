@@ -4,7 +4,7 @@
 
 ## 运行示例
 
-<img width="867" height="464" alt="屏幕截图 2026-09-29 165613" src="https://github.com/user-attachments/assets/84e790c6-93ea-47e2-a7cf-e05f469af3c7" />
+<img width="867" height="464" alt="屏幕截图 2026-09-29 175145" src="https://github.com/user-attachments/assets/c0cd7ec2-7ce2-4447-8684-8848c023095f" />
 
 ## 功能
 
