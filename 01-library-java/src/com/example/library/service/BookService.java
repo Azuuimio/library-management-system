@@ -115,7 +115,7 @@ public final class BookService {
      *
      * @param keyword 书名关键词，查询前会去除首尾空白
      * @return 包含当前未归还数量的图书展示信息；没有匹配项时返回空列表
-     * @throws BusinessException 关键词为 {@code null} 或仅包含空白
+     * @throws BusinessException 关键词为 {@code null}、空字符串或仅包含空白字符
      */
     public List<BookView> searchNotDeletedByTitle(String keyword) {
         if (keyword == null || keyword.isBlank()) {

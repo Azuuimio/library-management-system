@@ -48,7 +48,7 @@ public interface BorrowRecordDao {
      *
      * @param userId 用户编号
      * @param bookId 图书编号
-     * @return 存在同时匹配用户和图书的未归还记录时返回 {@code true}
+     * @return 存在同时匹配用户和图书的未归还记录时返回 {@code true}，否则返回 {@code false}
      */
     boolean existsUnreturned(long userId, long bookId);
 

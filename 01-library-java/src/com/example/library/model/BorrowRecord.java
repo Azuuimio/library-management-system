@@ -20,7 +20,7 @@ public record BorrowRecord(long id, long userId, long bookId,
     /**
      * 根据归还时间是否已填写，判断图书是否已归还。
      *
-     * @return 归还时间不为 {@code null} 时返回 {@code true}
+     * @return 归还时间不为 {@code null} 时返回 {@code true}，否则返回 {@code false}
      */
     public boolean isReturned() {
         return returnedAt != null;

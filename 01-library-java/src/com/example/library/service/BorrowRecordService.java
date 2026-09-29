@@ -77,7 +77,7 @@ public class BorrowRecordService {
     }
 
     /**
-     * 查询全部借阅记录，并补充当前用户名、书名和图书删除标记。
+     * 查询全部借阅记录，并补充当前账号名称、书名和图书删除标记。
      *
      * @return 包括已归还和未归还记录的展示信息；没有记录时返回空列表
      * @throws StorageException 某条记录关联的用户或图书不存在
@@ -87,7 +87,7 @@ public class BorrowRecordService {
     }
 
     /**
-     * 查询当前用户的全部借阅记录，并补充当前用户名、书名和图书删除标记。
+     * 查询当前用户的全部借阅记录，并补充当前账号名称、书名和图书删除标记。
      *
      * @param currentUser 已登录的用户，由调用方保证不为 {@code null}
      * @return 该用户已归还和未归还记录的展示信息；没有记录时返回空列表
