@@ -32,12 +32,14 @@ public class ConsoleUi {
 
     public void run() {
         try {
+            io.println("欢迎使用图书管理系统");
             while (true) {
                 io.println("""
+                        
                         ==== 菜单·登录 ====
                           1. 登录
                           0. 退出
-                        ==================""");
+                        ===================""");
                 switch (readChoice(1)) {
                     case 0 -> {
                         io.println("再见！");
@@ -72,6 +74,7 @@ public class ConsoleUi {
             int choice;
             if (admin) {
                 io.println("""
+                        
                         === 菜单·管理员 ===
                           1. 添加图书
                           2. 删除图书
@@ -80,17 +83,18 @@ public class ConsoleUi {
                           5. 全部图书
                           6. 全部借阅
                           0. 退出登录
-                        ==================""");
+                        ===================""");
                 choice = readChoice(6);
             } else {
                 io.println("""
+                        
                         ==== 菜单·读者 ====
                           1. 查询图书
                           2. 借阅图书
                           3. 归还图书
                           4. 我的借阅
                           0. 退出登录
-                        ==================""");
+                        ===================""");
                 choice = readChoice(4);
             }
             if (choice == 0) {
