@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
  * <p>编号、数量、价格和文本输入会在校验失败后重新读取。
  * 输入流结束时抛出 {@link EndOfInputException}，由控制台界面统一结束交互。
  */
-public class ConsoleIo {
+public final class ConsoleIo {
     private final BufferedReader input;
     private final PrintWriter output;
 

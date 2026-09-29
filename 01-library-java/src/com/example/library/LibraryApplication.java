@@ -18,7 +18,7 @@ import java.nio.file.Path;
 /**
  * 程序入口，依次初始化数据文件、加载并检查数据、组装业务对象，然后启动控制台界面。
  */
-public class LibraryApplication {
+public final class LibraryApplication {
     private LibraryApplication() {
     }
 

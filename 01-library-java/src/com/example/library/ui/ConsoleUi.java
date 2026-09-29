@@ -21,7 +21,7 @@ import java.util.List;
  * <p>管理员可以管理图书和查看全部借阅，读者可以查询图书、借还图书和查看本人借阅。
  * 业务异常在对应操作中显示为失败提示；数据异常继续向程序入口传递。
  */
-public class ConsoleUi {
+public final class ConsoleUi {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
     private final ConsoleIo io;
     private final UserService userService;
@@ -49,7 +49,7 @@ public class ConsoleUi {
             io.println("欢迎使用图书管理系统");
             while (true) {
                 io.println("""
-                        
+
                         ==== 菜单·登录 ====
                           1. 登录
                           0. 退出
@@ -88,7 +88,7 @@ public class ConsoleUi {
             int choice;
             if (admin) {
                 io.println("""
-                        
+
                         === 菜单·管理员 ===
                           1. 添加图书
                           2. 删除图书
@@ -101,7 +101,7 @@ public class ConsoleUi {
                 choice = readChoice(6);
             } else {
                 io.println("""
-                        
+
                         ==== 菜单·读者 ====
                           1. 查询图书
                           2. 全部图书
@@ -291,22 +291,22 @@ public class ConsoleUi {
     /**
      * 读取菜单编号，输入无效时持续提示并重新读取。
      *
-     * @param max 当前菜单允许的最大编号，须为非负数
+     * @param maxChoice 当前菜单允许的最大编号，须为非负数
      * @return 0 到最大编号之间的整数，包含两端
      * @throws ConsoleIo.EndOfInputException 输入流已结束，无法继续读取
      * @throws java.io.UncheckedIOException 读取控制台输入失败
      */
-    private int readChoice(int max) {
+    private int readChoice(int maxChoice) {
         while (true) {
             String choice = io.readLine("请选择功能：").strip();
             try {
                 int number = Integer.parseInt(choice);
-                if (number >= 0 && number <= max) {
+                if (number >= 0 && number <= maxChoice) {
                     return number;
                 }
             } catch (NumberFormatException ignored) {
             }
-            io.println("输入无效，请输入 0 到 " + max + " 之间的整数。");
+            io.println("输入无效，请输入 0 到 " + maxChoice + " 之间的整数。");
         }
     }
 
@@ -325,9 +325,9 @@ public class ConsoleUi {
      */
     private static String escapeControlChars(String text) {
         StringBuilder result = new StringBuilder();
-        for (int offset = 0; offset < text.length();) {
-            int character = text.codePointAt(offset);
-            offset += Character.charCount(character);
+        for (int i = 0; i < text.length();) {
+            int character = text.codePointAt(i);
+            i += Character.charCount(character);
             switch (character) {
                 case '\n' -> result.append("\\n");
                 case '\r' -> result.append("\\r");
