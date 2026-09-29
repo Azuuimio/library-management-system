@@ -4,10 +4,10 @@ import com.example.library.dao.UserDao;
 import com.example.library.exception.BusinessException;
 import com.example.library.model.User;
 
-public final class LoginService {
+public final class UserService {
     private final UserDao userDao;
 
-    public LoginService(UserDao userDao) {
+    public UserService(UserDao userDao) {
         this.userDao = userDao;
     }
 

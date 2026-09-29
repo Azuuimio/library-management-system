@@ -38,7 +38,7 @@ public class BorrowRecordService {
     }
 
     public void returnBook(User currentUser, long recordId) {
-        BorrowRecord record = findOwnedRecordById(recordId, currentUser.id());
+        BorrowRecord record = findOwnedById(recordId, currentUser.id());
         if (record.isReturned()) {
             throw new BusinessException("这条借阅记录已经归还，不能重复归还");
         }
@@ -58,7 +58,7 @@ public class BorrowRecordService {
         return borrowRecordDao.findByUserId(currentUser.id()).stream().map(this::toView).toList();
     }
 
-    private BorrowRecord findOwnedRecordById(long recordId, long userId) {
+    private BorrowRecord findOwnedById(long recordId, long userId) {
         return borrowRecordDao.findById(recordId).filter(borrowRecord -> borrowRecord.userId() == userId).
                 orElseThrow(() -> new BusinessException("借阅记录不存在或不属于当前读者"));
     }
