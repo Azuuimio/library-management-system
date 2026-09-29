@@ -48,7 +48,7 @@ public class ConsoleUi {
                     case 1 -> login();
                 }
             }
-        } catch (ConsoleIo.EndOfInput ignored) {
+        } catch (ConsoleIo.EndOfInputException ignored) {
             io.println("\n输入已结束，程序退出。");
         }
     }
@@ -64,7 +64,7 @@ public class ConsoleUi {
             pressEnterToContinue();
             return;
         }
-        io.println("登录成功，欢迎 " + visible(currentUser.username()) + "。");
+        io.println("登录成功，欢迎 " + escapeControlChars(currentUser.username()) + "。");
         menu(currentUser);
     }
 
@@ -90,12 +90,13 @@ public class ConsoleUi {
                         
                         ==== 菜单·读者 ====
                           1. 查询图书
-                          2. 借阅图书
-                          3. 归还图书
-                          4. 我的借阅
+                          2. 全部图书
+                          3. 借阅图书
+                          4. 归还图书
+                          5. 我的借阅
                           0. 退出登录
                         ===================""");
-                choice = readChoice(4);
+                choice = readChoice(5);
             }
             if (choice == 0) {
                 io.println("已退出登录。");
@@ -124,17 +125,18 @@ public class ConsoleUi {
     private void readerAction(User currentUser, int choice) {
         switch (choice) {
             case 1 -> search();
-            case 2 -> borrowBook(currentUser);
-            case 3 -> returnBook(currentUser);
-            case 4 -> listMyBorrowRecords(currentUser);
+            case 2 -> listAllBooks();
+            case 3 -> borrowBook(currentUser);
+            case 4 -> returnBook(currentUser);
+            case 5 -> listMyBorrowRecords(currentUser);
         }
     }
 
     private void addBook() {
         io.println("—— 添加图书 ——");
         try {
-            String title = io.readText("书名：", null);
-            String author = io.readText("作者：", null);
+            String title = io.readText("书名：", "书名", null);
+            String author = io.readText("作者：", "作者", null);
             BigDecimal price = io.readPrice("价格：", null);
             int quantity = io.readQuantity("总数量：", null);
             Book book = bookService.add(title, author, price, quantity);
@@ -149,7 +151,7 @@ public class ConsoleUi {
         try {
             long bookId = io.readId("请输入要删除的图书编号：");
             Book book = bookService.findById(bookId).book();
-            if (io.confirm("确认删除《" + visible(book.title()) + "》")) {
+            if (io.confirm("确认删除《" + escapeControlChars(book.title()) + "》")) {
                 bookService.delete(bookId);
                 io.println("删除成功。");
             } else {
@@ -169,8 +171,8 @@ public class ConsoleUi {
             io.println("当前信息：");
             showBook(current);
             io.println("直接回车保留当前值；数量指总数量，不是可借数量。");
-            String title = io.readText("书名 [" + visible(book.title()) + "]：", book.title());
-            String author = io.readText("作者 [" + visible(book.author()) + "]：", book.author());
+            String title = io.readText("书名 [" + escapeControlChars(book.title()) + "]：", "书名", book.title());
+            String author = io.readText("作者 [" + escapeControlChars(book.author()) + "]：", "作者", book.author());
             BigDecimal price = io.readPrice("价格 [" + book.price().toPlainString() + "]：", book.price());
             int quantity = io.readQuantity("总数量 [" + book.totalQuantity() + "]：", book.totalQuantity());
             bookService.update(bookId, title, author, price, quantity);
@@ -180,13 +182,9 @@ public class ConsoleUi {
         }
     }
 
-    private void search() {
-        io.println("—— 查询图书 ——");
-        try {
-            showBooks(bookService.searchNotDeletedByTitle(io.readLine("请输入书名（支持模糊匹配）：")));
-        } catch (BusinessException exception) {
-            io.println("查询失败：" + exception.getMessage());
-        }
+    private void listAllBorrowRecords() {
+        io.println("—— 全部借阅 ——");
+        showBorrowRecords(borrowRecordService.findAll());
     }
 
     private void borrowBook(User currentUser) {
@@ -211,19 +209,23 @@ public class ConsoleUi {
         }
     }
 
-    private void listAllBooks() {
-        io.println("—— 全部图书 ——");
-        showBooks(bookService.findAllNotDeleted());
-    }
-
-    private void listAllBorrowRecords() {
-        io.println("—— 全部借阅 ——");
-        showBorrowRecords(borrowRecordService.findAll());
-    }
-
     private void listMyBorrowRecords(User currentUser) {
         io.println("—— 我的借阅 ——");
         showBorrowRecords(borrowRecordService.findByUser(currentUser));
+    }
+
+    private void search() {
+        io.println("—— 查询图书 ——");
+        try {
+            showBooks(bookService.searchNotDeletedByTitle(io.readLine("请输入书名关键词：")));
+        } catch (BusinessException exception) {
+            io.println("查询失败：" + exception.getMessage());
+        }
+    }
+
+    private void listAllBooks() {
+        io.println("—— 全部图书 ——");
+        showBooks(bookService.findAllNotDeleted());
     }
 
     private void showBooks(List<BookView> books) {
@@ -240,12 +242,12 @@ public class ConsoleUi {
     private void showBook(BookView view) {
         Book book = view.book();
         io.println("编号：" + book.id()
-                   + " | 书名：" + visible(book.title())
-                   + " | 作者：" + visible(book.author())
-                   + " | 价格：" + book.price().toPlainString()
-                   + " | 总数：" + book.totalQuantity()
-                   + " | 借出：" + view.unreturnedQuantity()
-                   + " | 可借：" + view.availableQuantity());
+                + " | 书名：" + escapeControlChars(book.title())
+                + " | 作者：" + escapeControlChars(book.author())
+                + " | 价格：" + book.price().toPlainString()
+                + " | 总数：" + book.totalQuantity()
+                + " | 借出：" + view.unreturnedQuantity()
+                + " | 可借：" + view.availableQuantity());
     }
 
     private void showBorrowRecords(List<BorrowRecordView> records) {
@@ -254,14 +256,15 @@ public class ConsoleUi {
             return;
         }
         for (BorrowRecordView view : records) {
-            BorrowRecord record = view.record();
-            io.println("借阅编号：" + record.id() + " | 读者：" + visible(view.username())
-                       + " | 图书：" + record.bookId() + " / " + visible(view.bookTitle())
-                       + (view.bookDeleted() ? "（已删除）" : "")
-                       + " | 借阅：" + DATE_TIME_FORMATTER.format(record.borrowedAt())
-                       + " | 归还：" + (record.isReturned()
-                               ? DATE_TIME_FORMATTER.format(record.returnedAt())
-                               : "未归还"));
+            BorrowRecord borrowRecord = view.borrowRecord();
+            String returnedText = borrowRecord.isReturned()
+                    ? DATE_TIME_FORMATTER.format(borrowRecord.returnedAt())
+                    : "未归还";
+            io.println("借阅编号：" + borrowRecord.id() + " | 读者：" + escapeControlChars(view.username())
+                    + " | 图书：" + borrowRecord.bookId() + " / " + escapeControlChars(view.bookTitle())
+                    + (view.bookDeleted() ? "（已删除）" : "")
+                    + " | 借阅：" + DATE_TIME_FORMATTER.format(borrowRecord.borrowedAt())
+                    + " | 归还：" + returnedText);
         }
         io.println("共 " + records.size() + " 条借阅记录。");
     }
@@ -276,7 +279,7 @@ public class ConsoleUi {
                 }
             } catch (NumberFormatException ignored) {
             }
-            io.println("输入无效，请输入0-" + max + "之间的整数。");
+            io.println("输入无效，请输入 0 到 " + max + " 之间的整数。");
         }
     }
 
@@ -284,7 +287,7 @@ public class ConsoleUi {
         io.readLine("按回车键继续……");
     }
 
-    private static String visible(String text) {
+    private static String escapeControlChars(String text) {
         StringBuilder result = new StringBuilder();
         for (int offset = 0; offset < text.length();) {
             int character = text.codePointAt(offset);

@@ -58,8 +58,8 @@ public final class BookService {
     }
 
     public List<BookView> searchNotDeletedByTitle(String keyword) {
-        if (keyword == null) {
-            throw new BusinessException("查询关键词不能为 null");
+        if (keyword == null || keyword.isBlank()) {
+            throw new BusinessException("搜索关键词不能为空");
         }
         return bookDao.searchNotDeletedByTitle(keyword.strip()).stream().map(this::toView).toList();
     }

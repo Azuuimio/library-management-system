@@ -62,7 +62,7 @@ final class CsvFileIO {
         }
     }
 
-    static StorageException invalidRow(Path file, int index, RuntimeException cause) {
+    static StorageException invalidRowException(Path file, int index, RuntimeException cause) {
         return new StorageException(file.getFileName() + " 第 " + (index + 2)
                 + " 条记录格式错误：" + cause.getMessage(), cause);
     }
