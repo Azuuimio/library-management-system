@@ -1,12 +1,12 @@
 # Java 全栈练习项目：图书管理系统
 
-用同一个图书管理系统逐步引入新技术栈。
+用同一个图书管理系统逐步引入新技术。
 
 ## 阶段规划
 
 | 阶段 | 目录 | 新增技术 |
 | :--- | :--- | :--- |
-| 01 | 01-library-java | 纯 Java SE |
+| 01 | 01-library-java | Java SE |
 | 02 | 02-library-jdbc-mysql | JDBC + MySQL |
 | 03 | 03-library-mybatis | MyBatis |
 | 04 | 04-library-mybatis-plus | MyBatis-Plus |
