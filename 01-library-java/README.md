@@ -34,22 +34,18 @@ Java SE
 1. 设置当前 PowerShell 会话的编码（每次打开新终端后都需要执行）：
 
    ```powershell
-   chcp 65001 > $null
    $utf8 = [System.Text.UTF8Encoding]::new($false)
    [Console]::InputEncoding = $utf8
    [Console]::OutputEncoding = $utf8
-   $OutputEncoding = $utf8
    ```
-
+   
 2. 编译：
 
    ```powershell
-   New-Item -ItemType Directory -Path out -Force | Out-Null
-   $sources = @(Get-ChildItem -Path .\src -Recurse -Filter *.java | ForEach-Object { $_.FullName })
+   $sources = (Get-ChildItem .\src -Recurse -Filter *.java).FullName
    javac -encoding UTF-8 -d out $sources
-   if ($LASTEXITCODE -ne 0) { throw '编译失败，请根据错误信息修复后重试。' }
    ```
-
+   
 3. 启动：
 
    ```powershell
