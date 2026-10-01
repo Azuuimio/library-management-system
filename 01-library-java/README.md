@@ -1,85 +1,82 @@
 # 01-library-java
 
-基于纯 Java SE 开发的控制台图书管理系统，采用 CSV 文件实现数据持久化存储。
+## 技术栈
+
+纯 Java SE。
 
 ## 运行示例
 
-<img width="867" height="464" alt="屏幕截图 2026-09-29 175145" src="https://github.com/user-attachments/assets/c0cd7ec2-7ce2-4447-8684-8848c023095f" />
+<img width="867" height="464" alt="图书管理系统控制台运行示例" src="https://github.com/user-attachments/assets/c0cd7ec2-7ce2-4447-8684-8848c023095f" />
 
-## 功能
+## 功能与边界
 
-**管理员（ADMIN）**
+### 角色功能
 
-- 添加图书 / 删除图书 / 修改图书
-- 查询图书 / 查看全部图书
-- 查看全部借阅
+- 管理员：添加、修改、删除图书；按书名查询、查看全部图书；查看全部借阅记录。
+- 读者：按书名查询、查看全部图书；借阅、归还图书；查看本人借阅记录。
 
-**读者（READER）**
+### 当前限制
 
-- 查询图书 / 查看全部图书
-- 借阅图书 / 归还图书 / 查看我的借阅
+- 仅支持无密码预制账号，不提供注册和账号管理。
+- 不支持多并发读写。
 
-## 运行方式
+## 快速开始
 
-用 IntelliJ IDEA 打开本目录，构建并运行。
+### 环境准备
 
-也可以使用其他方式构建和运行。
+- 开发使用 JDK 25，未验证最低兼容版本。
+- 执行命令前确保 `java`、`javac` 已加入 `PATH`。
 
-注意：本项目所有读写统一使用 UTF-8，因此，运行环境和数据文件必须与 UTF-8 保持一致。
+### 构建与启动
 
-## 预制账号
+以下命令在 `01-library-java` 目录下使用 PowerShell 执行。
 
-本阶段使用无密码预制账号，登录时只需输入账号名称。
+1. 设置当前 PowerShell 会话的编码（每次打开新终端后都需要执行）：
 
-| 账号名称 | 角色            |
-| :------- | :-------------- |
-| admin    | 管理员（ADMIN） |
-| reader1  | 读者（READER）  |
-| reader2  | 读者（READER）  |
+   ```powershell
+   chcp 65001 > $null
+   $utf8 = [System.Text.UTF8Encoding]::new($false)
+   [Console]::InputEncoding = $utf8
+   [Console]::OutputEncoding = $utf8
+   $OutputEncoding = $utf8
+   ```
+
+2. 编译：
+
+   ```powershell
+   New-Item -ItemType Directory -Path out -Force | Out-Null
+   $sources = @(Get-ChildItem -Path .\src -Recurse -Filter *.java | ForEach-Object { $_.FullName })
+   javac -encoding UTF-8 -d out $sources
+   if ($LASTEXITCODE -ne 0) { throw '编译失败，请根据错误信息修复后重试。' }
+   ```
+
+3. 启动：
+
+   ```powershell
+   java -cp out com.example.library.LibraryApplication
+   ```
+
+### 登录预制账号
+
+输入以下预制账号名称登录：
+
+| 账号 | 角色 |
+| :--- | :--- |
+| admin | 管理员 |
+| reader1 | 读者 |
+| reader2 | 读者 |
 
 ## 项目架构
 
-```
+```text
 com.example.library
-├── LibraryApplication                    # 程序入口
-├── model                                 # 领域模型
-│   ├── Book
-│   ├── BorrowRecord
-│   ├── Role
-│   ├── User
-│   └── view
-│       ├── BookView
-│       └── BorrowRecordView
-├── dao                                   # 数据访问接口
-│   ├── BookDao
-│   ├── BorrowRecordDao
-│   ├── UserDao
-│   └── csv                               # CSV 实现
-│       ├── CsvBookDao
-│       ├── CsvBorrowRecordDao
-│       ├── CsvUserDao
-│       ├── CsvCodec
-│       ├── CsvDataValidator
-│       ├── CsvFileIo
-│       └── CsvInitializer
-├── service                               # 业务逻辑
-│   ├── BookService
-│   ├── BorrowRecordService
-│   └── UserService
-├── ui                                    # 控制台交互
-│   ├── ConsoleIo
-│   └── ConsoleUi
-├── validation                            # 数据校验
-│   └── BookValidator
-└── exception                             # 异常
-    ├── BusinessException
-    └── StorageException
+├── LibraryApplication  # 程序入口、数据初始化与对象组装
+├── model               # 领域模型
+│   └── view            # 展示所需的组合数据
+├── dao                 # 数据访问接口
+│   └── csv             # CSV 存储实现
+├── service             # 业务逻辑
+├── ui                  # 控制台交互
+├── validation          # 图书字段校验
+└── exception           # 业务与存储异常
 ```
-
-## 开发环境
-
-| 项目 | 版本 |
-| :--- | :--- |
-| 操作系统 | Windows 11 |
-| JDK | 25（LTS） |
-| IDE | IntelliJ IDEA |
