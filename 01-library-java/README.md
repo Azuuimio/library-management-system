@@ -6,7 +6,7 @@ Java SE
 
 ## 运行示例
 
-<img width="867" height="464" alt="图书管理系统控制台运行示例" src="https://github.com/user-attachments/assets/c0cd7ec2-7ce2-4447-8684-8848c023095f" />
+<img width="867" height="464" alt="屏幕截图 2026-10-02 114534" src="https://github.com/user-attachments/assets/8ff11bf8-8a43-4001-8af7-bdcdf05cb4e2" />
 
 ## 功能与边界
 
