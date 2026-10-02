@@ -128,7 +128,7 @@ public final class ConsoleIo {
      *
      * @param prompt 读取输入前显示的提示文字
      * @param defaultValue 空输入时返回的默认值，可为 {@code null}
-     * @return 完成时包含校验后保留两位小数的价格，或提供的默认值；
+     * @return 完成时包含按价格校验方法处理后的价格，或提供的默认值；
      *         空输入且未提供默认值时返回取消状态，输入流结束时返回结束状态
      * @throws UncheckedIOException 读取控制台输入失败
      */

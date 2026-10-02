@@ -40,7 +40,7 @@ public interface BookDao {
      *
      * @param title 已校验并去除首尾空白的书名
      * @param author 已校验并去除首尾空白的作者
-     * @param price 已校验并补齐两位小数的价格
+     * @param price 已按 {@link com.example.library.validation.BookValidator#validateAndNormalizePrice(BigDecimal)} 处理的价格
      * @param totalQuantity 已校验的图书总数量
      * @return 保存后的图书，包含分配的编号
      * @throws com.example.library.exception.StorageException 编号无法分配或保存失败
