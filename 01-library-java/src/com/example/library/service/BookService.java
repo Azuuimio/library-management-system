@@ -28,8 +28,8 @@ public final class BookService {
     /**
      * 校验图书字段，去除文本首尾空白、补齐价格小数位后保存新图书。
      *
-     * @param title 书名，去除首尾空白后须为 1 到 200 个 Unicode 码点
-     * @param author 作者，去除首尾空白后须为 1 到 200 个 Unicode 码点
+     * @param title 书名，规则见 {@link BookValidator#validateAndNormalizeText(String, String)}
+     * @param author 作者，规则见 {@link BookValidator#validateAndNormalizeText(String, String)}
      * @param price 价格，规则见 {@link BookValidator#validateAndNormalizePrice(BigDecimal)}
      * @param totalQuantity 非负的图书总数量
      * @return 保存后的图书，包含新分配的编号
@@ -68,8 +68,8 @@ public final class BookService {
      * 新的总数量不能小于该图书当前未归还的数量。
      *
      * @param bookId 要修改的图书编号
-     * @param title 新书名，去除首尾空白后须为 1 到 200 个 Unicode 码点
-     * @param author 新作者，去除首尾空白后须为 1 到 200 个 Unicode 码点
+     * @param title 新书名，规则见 {@link BookValidator#validateAndNormalizeText(String, String)}
+     * @param author 新作者，规则见 {@link BookValidator#validateAndNormalizeText(String, String)}
      * @param price 新价格，规则见 {@link BookValidator#validateAndNormalizePrice(BigDecimal)}
      * @param totalQuantity 新的非负总数量，包括已借出但未归还的数量
      * @throws BusinessException 图书不存在或已删除、字段校验失败，或新总数量小于未归还数量

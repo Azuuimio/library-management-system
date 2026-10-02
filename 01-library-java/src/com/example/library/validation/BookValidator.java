@@ -18,7 +18,7 @@ public final class BookValidator {
     }
 
     /**
-     * 去除文本首尾空白，并检查长度为 1 到 200 个 Unicode 码点。
+     * 去除文本首尾空白，并检查长度为 1 到 {@value #MAX_TEXT_LENGTH} 个 Unicode 码点。
      *
      * @param value 待校验的书名或作者
      * @param label 错误提示中使用的字段名称，例如“书名”
@@ -37,7 +37,7 @@ public final class BookValidator {
     }
 
     /**
-     * 检查价格在 0.00 到 99999.99 之间，并将小数位补齐到两位。
+     * 检查价格非负且不超过 {@link #MAX_PRICE}，并将小数位补齐到两位。
      *
      * <p>上下限均可取。小数位数按 {@link BigDecimal#scale()} 判断，超过两位时直接拒绝，
      * 包括 {@code 1.000} 这样的值；此方法不进行四舍五入。
