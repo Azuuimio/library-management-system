@@ -85,7 +85,7 @@ public final class BookService {
                 BookValidator.validateQuantity(totalQuantity),
                 false);
         if (replacement.totalQuantity() < borrowRecordDao.countUnreturnedByBookId(bookId)) {
-            throw new BusinessException("总数量不能小于当前未归还数量");
+            throw new BusinessException("总数不能小于当前未归还数量");
         }
         bookDao.update(replacement);
     }

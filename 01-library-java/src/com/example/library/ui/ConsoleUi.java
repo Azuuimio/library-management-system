@@ -46,14 +46,13 @@ public final class ConsoleUi {
      */
     public void run() {
         try {
-            io.println("欢迎使用图书管理系统");
+            io.println("欢迎使用图书管理系统！");
             while (true) {
                 io.println("""
-
-                        ==== 菜单·登录 ====
-                          1. 登录
-                          0. 退出
-                        ===================""");
+                        
+                        ===菜单===
+                        1. 登录
+                        0. 退出""");
                 switch (readChoice(1)) {
                     case 0 -> {
                         io.println("再见！");
@@ -68,11 +67,14 @@ public final class ConsoleUi {
     }
 
     private void login() {
-        io.println("—— 登录 ——");
-        String username = io.readLine("账号：");
+        io.println("\n===登录===");
         User currentUser;
         try {
+            String username = io.readLine("账号：", true).strip();
             currentUser = userService.login(username);
+        } catch (ConsoleIo.CancelledInputException ignored) {
+            io.println("已取消登录。");
+            return;
         } catch (BusinessException exception) {
             io.println("登录失败：" + exception.getMessage());
             pressEnterToContinue();
@@ -87,41 +89,43 @@ public final class ConsoleUi {
         while (true) {
             int choice;
             if (admin) {
-                io.println("""
-
-                        === 菜单·管理员 ===
-                          1. 添加图书
-                          2. 删除图书
-                          3. 修改图书
-                          4. 查询图书
-                          5. 全部图书
-                          6. 全部借阅
-                          0. 退出登录
-                        ===================""");
+                io.println("""                          
+                        
+                        ===管理员===
+                        1. 添加图书
+                        2. 删除图书
+                        3. 修改图书
+                        4. 查询图书
+                        5. 全部图书
+                        6. 全部借阅
+                        0. 退出登录""");
                 choice = readChoice(6);
             } else {
                 io.println("""
 
-                        ==== 菜单·读者 ====
-                          1. 查询图书
-                          2. 全部图书
-                          3. 借阅图书
-                          4. 归还图书
-                          5. 我的借阅
-                          0. 退出登录
-                        ===================""");
+                        ===读者===
+                        1. 查询图书
+                        2. 全部图书
+                        3. 借阅图书
+                        4. 归还图书
+                        5. 我的借阅
+                        0. 退出登录""");
                 choice = readChoice(5);
             }
             if (choice == 0) {
                 io.println("已退出登录。");
                 return;
             }
-            if (admin) {
-                adminAction(choice);
-            } else {
-                readerAction(currentUser, choice);
+            try {
+                if (admin) {
+                    adminAction(choice);
+                } else {
+                    readerAction(currentUser, choice);
+                }
+                pressEnterToContinue();
+            } catch (ConsoleIo.CancelledInputException ignored) {
+                io.println("已取消操作。");
             }
-            pressEnterToContinue();
         }
     }
 
@@ -147,12 +151,12 @@ public final class ConsoleUi {
     }
 
     private void addBook() {
-        io.println("—— 添加图书 ——");
+        io.println("\n===添加图书===");
         try {
             String title = io.readText("书名：", "书名", null);
             String author = io.readText("作者：", "作者", null);
             BigDecimal price = io.readPrice("价格：", null);
-            int quantity = io.readQuantity("总数量：", null);
+            int quantity = io.readQuantity("总数：", null);
             Book book = bookService.add(title, author, price, quantity);
             io.println("添加成功。图书编号：" + book.id());
         } catch (BusinessException exception) {
@@ -161,11 +165,11 @@ public final class ConsoleUi {
     }
 
     private void deleteBook() {
-        io.println("—— 删除图书 ——");
+        io.println("\n===删除图书===");
         try {
             long bookId = io.readId("请输入要删除的图书编号：");
             Book book = bookService.findById(bookId).book();
-            if (io.confirm("确认删除《" + escapeControlChars(book.title()) + "》")) {
+            if (io.confirm("确认删除图书：" + escapeControlChars(book.title()))) {
                 bookService.delete(bookId);
                 io.println("删除成功。");
             } else {
@@ -177,23 +181,30 @@ public final class ConsoleUi {
     }
 
     /**
-     * 展示图书当前信息并读取修改值，直接回车时保留对应字段的当前值。
+     * 展示图书当前信息并读取修改值，空输入保留对应字段的当前值。
      *
-     * <p>数量输入代表总数量，最终由业务层检查其是否小于当前未归还数量。
+     * <p>数量输入代表总数，小于当前未归还数量时重新输入，保存前仍由业务层校验。
      */
     private void updateBook() {
-        io.println("—— 修改图书 ——");
+        io.println("\n===修改图书===");
         try {
             long bookId = io.readId("请输入要修改的图书编号：");
             BookView current = bookService.findById(bookId);
             Book book = current.book();
             io.println("当前信息：");
             showBook(current);
-            io.println("直接回车保留当前值；数量指总数量，不是可借数量。");
+            io.println("直接回车保留当前值。");
             String title = io.readText("书名 [" + escapeControlChars(book.title()) + "]：", "书名", book.title());
             String author = io.readText("作者 [" + escapeControlChars(book.author()) + "]：", "作者", book.author());
             BigDecimal price = io.readPrice("价格 [" + book.price().toPlainString() + "]：", book.price());
-            int quantity = io.readQuantity("总数量 [" + book.totalQuantity() + "]：", book.totalQuantity());
+            int quantity;
+            while (true) {
+                quantity = io.readQuantity("总数 [" + book.totalQuantity() + "]：", book.totalQuantity());
+                if (quantity >= current.unreturnedQuantity()) {
+                    break;
+                }
+                io.println("总数不能小于当前未归还数量，请重新输入。");
+            }
             bookService.update(bookId, title, author, price, quantity);
             io.println("修改成功。");
         } catch (BusinessException exception) {
@@ -202,12 +213,12 @@ public final class ConsoleUi {
     }
 
     private void listAllBorrowRecords() {
-        io.println("—— 全部借阅 ——");
+        io.println("\n===全部借阅===");
         showBorrowRecords(borrowRecordService.findAll());
     }
 
     private void borrowBook(User currentUser) {
-        io.println("—— 借阅图书 ——");
+        io.println("\n===借阅图书===");
         try {
             long bookId = io.readId("请输入图书编号：");
             BorrowRecord record = borrowRecordService.borrowBook(currentUser, bookId);
@@ -218,7 +229,7 @@ public final class ConsoleUi {
     }
 
     private void returnBook(User currentUser) {
-        io.println("—— 归还图书 ——");
+        io.println("\n===归还图书===");
         try {
             long recordId = io.readId("请输入借阅记录编号（可从“我的借阅”查看）：");
             borrowRecordService.returnBook(currentUser, recordId);
@@ -229,27 +240,28 @@ public final class ConsoleUi {
     }
 
     private void listMyBorrowRecords(User currentUser) {
-        io.println("—— 我的借阅 ——");
+        io.println("\n===我的借阅===");
         showBorrowRecords(borrowRecordService.findByUser(currentUser));
     }
 
     private void search() {
-        io.println("—— 查询图书 ——");
+        io.println("\n===查询图书===");
         try {
-            showBooks(bookService.searchNotDeletedByTitle(io.readLine("请输入书名关键词：")));
+            String keyword = io.readLine("请输入书名关键词：", true).strip();
+            showBooks(bookService.searchNotDeletedByTitle(keyword), "未找到匹配的图书。");
         } catch (BusinessException exception) {
             io.println("查询失败：" + exception.getMessage());
         }
     }
 
     private void listAllBooks() {
-        io.println("—— 全部图书 ——");
-        showBooks(bookService.findAllNotDeleted());
+        io.println("\n===全部图书===");
+        showBooks(bookService.findAllNotDeleted(), "暂无图书。");
     }
 
-    private void showBooks(List<BookView> books) {
+    private void showBooks(List<BookView> books, String emptyMessage) {
         if (books.isEmpty()) {
-            io.println("未找到匹配的图书。");
+            io.println(emptyMessage);
             return;
         }
         for (BookView view : books) {
@@ -260,7 +272,7 @@ public final class ConsoleUi {
 
     private void showBook(BookView view) {
         Book book = view.book();
-        io.println("编号：" + book.id()
+        io.println("图书编号：" + book.id()
                 + " | 书名：" + escapeControlChars(book.title())
                 + " | 作者：" + escapeControlChars(book.author())
                 + " | 价格：" + book.price().toPlainString()
@@ -279,7 +291,7 @@ public final class ConsoleUi {
             String returnedText = borrowRecord.isReturned()
                     ? DATE_TIME_FORMATTER.format(borrowRecord.returnedAt())
                     : "未归还";
-            io.println("借阅编号：" + borrowRecord.id() + " | 读者：" + escapeControlChars(view.username())
+            io.println("借阅记录编号：" + borrowRecord.id() + " | 读者：" + escapeControlChars(view.username())
                     + " | 图书：" + borrowRecord.bookId() + " / " + escapeControlChars(view.bookTitle())
                     + (view.bookDeleted() ? "（已删除）" : "")
                     + " | 借阅：" + DATE_TIME_FORMATTER.format(borrowRecord.borrowedAt())
@@ -298,7 +310,7 @@ public final class ConsoleUi {
      */
     private int readChoice(int maxChoice) {
         while (true) {
-            String choice = io.readLine("请选择功能：").strip();
+            String choice = io.readLine("请选择功能：", false).strip();
             try {
                 int number = Integer.parseInt(choice);
                 if (number >= 0 && number <= maxChoice) {
@@ -311,7 +323,7 @@ public final class ConsoleUi {
     }
 
     private void pressEnterToContinue() {
-        io.readLine("按回车键继续……");
+        io.readLine("按回车键继续……", false);
     }
 
     /**
