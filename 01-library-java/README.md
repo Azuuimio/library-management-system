@@ -25,11 +25,11 @@ Java SE
 ### 环境准备
 
 - 开发使用 JDK 25，未验证最低兼容版本。
+
+### 方式一：命令行启动
+
 - 执行命令前确保 `java`、`javac` 已加入 `PATH`。
-
-### 构建与启动
-
-以下命令在 `01-library-java` 目录下使用 PowerShell 执行。
+- 以下命令在 `01-library-java` 目录下使用 PowerShell 执行。
 
 1. 设置当前 PowerShell 会话的编码（每次打开新终端后都需要执行）：
 
@@ -38,19 +38,24 @@ Java SE
    [Console]::InputEncoding = $utf8
    [Console]::OutputEncoding = $utf8
    ```
-   
+
 2. 编译：
 
    ```powershell
    $sources = (Get-ChildItem .\src -Recurse -Filter *.java).FullName
    javac -encoding UTF-8 -d out $sources
    ```
-   
+
 3. 启动：
 
    ```powershell
    java -cp out com.example.library.LibraryApplication
    ```
+
+### 方式二：IntelliJ IDEA 启动
+
+1. 使用 IDEA 打开 `01-library-java` 目录。
+2. 打开 `src/com/example/library/LibraryApplication.java`，构建并运行。
 
 ### 登录预制账号
 
