@@ -65,7 +65,7 @@ public final class BookValidator {
      */
     public static int validateQuantity(int quantity) {
         if (quantity < 0) {
-            throw new BusinessException("总数量不能为负");
+            throw new BusinessException("总数不能为负");
         }
         return quantity;
     }

@@ -14,7 +14,12 @@ import java.nio.charset.StandardCharsets;
 /**
  * 以 UTF-8 读取控制台输入并输出提示文字。
  *
- * <p>编号、数量、价格和文本输入会在校验失败后重新读取。
+ * <p>以下“空输入”包括空字符串和仅包含空白字符的输入。
+ * {@link #readLine(String, boolean)} 根据参数决定是否因空输入取消操作。
+ * 编号输入为空时取消；数量、价格和文本输入为空时，有默认值则返回默认值，否则取消。
+ * 默认值原样返回，不再校验；编号、数量、价格和文本的非空输入校验失败时，显示提示并重新读取。
+ *
+ * <p>取消输入时抛出 {@link CancelledInputException}，由控制台界面返回对应菜单。
  * 输入流结束时抛出 {@link EndOfInputException}，由控制台界面统一结束交互。
  */
 public final class ConsoleIo {
@@ -42,17 +47,22 @@ public final class ConsoleIo {
      * 显示提示后读取一行输入，保留首尾空白，不包含行结束符。
      *
      * @param prompt 读取输入前显示的提示文字
-     * @return 读取到的文字；用户直接回车时返回空字符串
+     * @param cancelOnEmpty 是否在空输入时取消当前操作
+     * @return 读取到的文字；允许空输入时，直接回车返回空字符串
+     * @throws CancelledInputException 启用空输入取消，且输入为空
      * @throws EndOfInputException 输入流已结束，无法继续读取
      * @throws UncheckedIOException 读取控制台输入失败
      */
-    public String readLine(String prompt) {
+    public String readLine(String prompt, boolean cancelOnEmpty) {
         output.print(prompt);
         output.flush();
         try {
             String line = input.readLine();
             if (line == null) {
                 throw new EndOfInputException();
+            }
+            if (cancelOnEmpty && line.isBlank()) {
+                throw new CancelledInputException();
             }
             return line;
         } catch (IOException exception) {
@@ -61,17 +71,18 @@ public final class ConsoleIo {
     }
 
     /**
-     * 读取正整数编号，输入无效时显示提示并重新读取。
+     * 读取正整数编号。
      *
      * @param prompt 读取输入前显示的提示文字
      * @return 去除首尾空白后解析得到的编号，范围为 1 到 {@link Long#MAX_VALUE}
+     * @throws CancelledInputException 输入为空
      * @throws EndOfInputException 输入流已结束，无法继续读取
      * @throws UncheckedIOException 读取控制台输入失败
      */
     public long readId(String prompt) {
         while (true) {
             try {
-                long id = Long.parseLong(readLine(prompt).strip());
+                long id = Long.parseLong(readLine(prompt, true).strip());
                 if (id > 0) {
                     return id;
                 }
@@ -82,21 +93,18 @@ public final class ConsoleIo {
     }
 
     /**
-     * 提示用户输入总数量，输入无效时显示原因并重新读取。
-     *
-     * <p>输入会先去除首尾空白。
-     * 输入为空且提供了默认值时，直接返回默认值，不再校验。
-     * 其他输入必须能解析为 0 到 {@link Integer#MAX_VALUE} 之间的整数。
+     * 读取图书总数，去除首尾空白后按非负整数校验。
      *
      * @param prompt 读取输入前显示的提示文字
-     * @param defaultValue 空输入时返回的默认值；为 {@code null} 时，空输入也需要重新输入
-     * @return 用户输入的非负整数，或提供的默认值
+     * @param defaultValue 空输入时返回的默认值，可为 {@code null}
+     * @return 0 到 {@link Integer#MAX_VALUE} 之间的整数，或提供的默认值
+     * @throws CancelledInputException 输入为空且未提供默认值
      * @throws EndOfInputException 输入流已结束，无法继续读取
      * @throws UncheckedIOException 读取控制台输入失败
      */
     public int readQuantity(String prompt, Integer defaultValue) {
         while (true) {
-            String text = readLine(prompt).strip();
+            String text = readLine(prompt, defaultValue == null).strip();
             if (text.isEmpty() && defaultValue != null) {
                 return defaultValue;
             }
@@ -111,20 +119,18 @@ public final class ConsoleIo {
     }
 
     /**
-     * 读取价格，输入无法解析或未通过价格校验时显示原因并重新读取。
-     *
-     * <p>输入会先去除首尾空白。输入为空且提供了默认值时，直接返回默认值，不再校验或补齐小数位。
-     * 其他输入按 {@link BookValidator#validateAndNormalizePrice(BigDecimal)} 校验并补齐两位小数。
+     * 读取价格，去除首尾空白后按 {@link BookValidator#validateAndNormalizePrice(BigDecimal)} 校验。
      *
      * @param prompt 读取输入前显示的提示文字
-     * @param defaultValue 空输入时返回的默认值；为 {@code null} 时，空输入也需要重新输入
+     * @param defaultValue 空输入时返回的默认值，可为 {@code null}
      * @return 校验后保留两位小数的价格，或提供的默认值
+     * @throws CancelledInputException 输入为空且未提供默认值
      * @throws EndOfInputException 输入流已结束，无法继续读取
      * @throws UncheckedIOException 读取控制台输入失败
      */
     public BigDecimal readPrice(String prompt, BigDecimal defaultValue) {
         while (true) {
-            String text = readLine(prompt).strip();
+            String text = readLine(prompt, defaultValue == null).strip();
             if (text.isEmpty() && defaultValue != null) {
                 return defaultValue;
             }
@@ -139,21 +145,19 @@ public final class ConsoleIo {
     }
 
     /**
-     * 读取书名或作者，去除首尾空白后校验，校验失败时显示原因并重新读取。
-     *
-     * <p>输入为空且提供了默认值时，直接返回默认值，不再校验或去除默认值的首尾空白。
-     * 其他输入须为 1 到 200 个 Unicode 码点。
+     * 读取书名或作者，去除首尾空白后校验，长度须为 1 到 200 个 Unicode 码点。
      *
      * @param prompt 读取输入前显示的提示文字
      * @param label 错误提示中使用的字段名称，例如“书名”
-     * @param defaultValue 空输入时返回的默认值；为 {@code null} 时，空输入也需要重新输入
+     * @param defaultValue 空输入时返回的默认值，可为 {@code null}
      * @return 去除首尾空白并通过校验的文本，或提供的默认值
+     * @throws CancelledInputException 输入为空且未提供默认值
      * @throws EndOfInputException 输入流已结束，无法继续读取
      * @throws UncheckedIOException 读取控制台输入失败
      */
     public String readText(String prompt, String label, String defaultValue) {
         while (true) {
-            String text = readLine(prompt).strip();
+            String text = readLine(prompt, defaultValue == null).strip();
             if (text.isEmpty() && defaultValue != null) {
                 return defaultValue;
             }
@@ -174,7 +178,17 @@ public final class ConsoleIo {
      * @throws UncheckedIOException 读取控制台输入失败
      */
     public boolean confirm(String prompt) {
-        return readLine(prompt + "（输入 y 确认，其他输入取消）：").strip().equalsIgnoreCase("y");
+        return readLine(prompt + "（输入 y 确认，其他输入取消）：", false).strip().equalsIgnoreCase("y");
+    }
+
+    /**
+     * 表示用户通过空输入取消当前操作，由控制台界面返回对应菜单。
+     */
+    static final class CancelledInputException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        CancelledInputException() {
+        }
     }
 
     /**
