@@ -26,7 +26,12 @@ Java SE
 
 - 开发使用 JDK 25，未验证最低兼容版本。
 
-### 方式一：命令行启动
+### 方式一：IntelliJ IDEA 启动
+
+1. 使用 IDEA 打开 `01-library-java` 目录。
+2. 打开 `src/com/example/library/LibraryApplication.java`，构建并运行。
+
+### 方式二：命令行启动
 
 - 执行命令前确保 `java`、`javac` 已加入 `PATH`。
 - 以下命令在 `01-library-java` 目录下使用 PowerShell 执行。
@@ -51,11 +56,6 @@ Java SE
    ```powershell
    java -cp out com.example.library.LibraryApplication
    ```
-
-### 方式二：IntelliJ IDEA 启动
-
-1. 使用 IDEA 打开 `01-library-java` 目录。
-2. 打开 `src/com/example/library/LibraryApplication.java`，构建并运行。
 
 ### 登录预制账号
 
