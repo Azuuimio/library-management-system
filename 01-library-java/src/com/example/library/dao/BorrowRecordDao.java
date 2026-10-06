@@ -23,7 +23,7 @@ public interface BorrowRecordDao {
     /**
      * 查询全部借阅记录，包括已归还和未归还的记录。
      *
-     * @return 全部借阅记录；没有记录时返回空列表
+     * @return 按借阅编号升序排列的全部借阅记录；没有记录时返回空列表
      */
     List<BorrowRecord> findAll();
 
