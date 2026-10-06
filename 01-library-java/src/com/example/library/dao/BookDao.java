@@ -21,7 +21,7 @@ public interface BookDao {
     Optional<Book> findById(long id);
 
     /**
-     * 查询全部未删除的图书。
+     * 按图书编号升序查询全部未删除的图书。
      *
      * @return 未删除的图书列表；没有符合条件的图书时返回空列表
      */
