@@ -31,7 +31,7 @@ public interface BorrowRecordDao {
      * 查询指定用户的全部借阅记录，包括已归还和未归还的记录。
      *
      * @param userId 用户编号
-     * @return 该用户的借阅记录；没有记录时返回空列表
+     * @return 按借阅编号升序排列的该用户的借阅记录；没有记录时返回空列表
      */
     List<BorrowRecord> findByUserId(long userId);
 
