@@ -31,7 +31,7 @@ public final class JdbcUserDao implements UserDao {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
             try (ResultSet result = statement.executeQuery()) {
-                return result = result.next() ? Optional.of(mapUser(result)) : Optional.empty()
+                return result.next() ? Optional.of(mapUser(result)) : Optional.empty();
             }
         } catch (SQLException exception) {
             throw new StorageException("查询用户失败", exception);
@@ -39,7 +39,8 @@ public final class JdbcUserDao implements UserDao {
     }
 
     private User mapUser(ResultSet result) throws SQLException {
-        return new User(result.getLong("id"),
+        return new User(
+                result.getLong("id"),
                 result.getString("username"),
                 Role.valueOf(result.getString("role")));
     }

@@ -46,7 +46,10 @@ public final class JdbcExecutor {
      */
     public <T> T executeQuery(Function<DaoContext, T> work) {
         try (Connection connection = connectionFactory.open()) {
-            return work.apply(new DaoContext(new JdbcUserDao(), new JdbcBookDao(), new JdbcBorrowRecordDao()));
+            return work.apply(new DaoContext(
+                    new JdbcUserDao(connection),
+                    new JdbcBookDao(connection),
+                    new JdbcBorrowRecordDao(connection)));
         } catch (BusinessException exception) {
             for (Throwable suppressed : exception.getSuppressed()) {
                 if (suppressed instanceof SQLException) {
@@ -55,7 +58,7 @@ public final class JdbcExecutor {
             }
             throw exception;
         } catch (SQLException exception) {
-            throw new StorageException("数据库连接创建或关闭失败", exception)
+            throw new StorageException("数据库连接创建或关闭失败", exception);
         }
     }
 
@@ -74,7 +77,10 @@ public final class JdbcExecutor {
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             connection.setAutoCommit(false);
             try {
-                T result = work.apply(new DaoContext(new JdbcUserDao(), new JdbcBookDao(), new JdbcBorrowRecordDao()));
+                T result = work.apply(new DaoContext(
+                        new JdbcUserDao(connection),
+                        new JdbcBookDao(connection),
+                        new JdbcBorrowRecordDao(connection)));
                 connection.commit();
                 return result;
             } catch (RuntimeException | SQLException exception) {
