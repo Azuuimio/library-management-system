@@ -2,7 +2,8 @@
 
 ## 技术栈
 
-Java SE + JDBC + MySQL，使用 Maven 管理依赖与构建。
+- Java SE + JDBC + MySQL
+- 使用 Maven 管理依赖与构建
 
 ## 功能说明
 
@@ -42,7 +43,7 @@ Java SE + JDBC + MySQL，使用 Maven 管理依赖与构建。
 启动 MySQL 服务，在 `02-library-jdbc-mysql` 目录下使用 PowerShell 连接数据库：
 
 ```powershell
-mysql --default-character-set=utf8mb4 -u root -p
+mysql -u root -p
 ```
 
 按提示输入 MySQL 密码，然后在同一个 MySQL 会话中依次执行：
