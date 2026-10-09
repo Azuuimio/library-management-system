@@ -37,19 +37,3 @@ CREATE TABLE borrow_records (
 
     CHECK (returned_at IS NULL OR returned_at >= borrowed_at)
 ) ENGINE=InnoDB;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * 处理图书的新增、修改、删除和查询，并为展示结果计算未归还数量。
+ * 处理图书的新增、修改、删除和查询，展示结果中的未归还数量由 DAO 查询计算。
  *
  * <p>删除图书和减少总数量前会检查借阅记录。
  * 管理员入口由控制台菜单提供，此类不检查调用者的角色。
@@ -114,6 +114,7 @@ public final class BookService {
      * @param bookId 图书编号
      * @return 供界面展示的图书信息
      * @throws BusinessException 图书不存在或已删除
+     * @throws com.example.library.exception.StorageException 查询图书展示信息或数据库连接处理失败
      */
     public BookView findById(long bookId) {
         return executor.executeQuery(context -> context.bookDao().findNotDeletedViewById(bookId)
@@ -124,9 +125,11 @@ public final class BookService {
      * 查询全部未删除图书，并为每本图书附上当前未归还数量。
      *
      * @return 图书展示信息列表；没有未删除图书时返回空列表
+     * @throws com.example.library.exception.StorageException 查询图书展示信息或数据库连接处理失败
      */
     public List<BookView> findAllNotDeleted() {
-        return executor.executeQuery(context -> context.bookDao().findAllNotDeletedViews());    }
+        return executor.executeQuery(context -> context.bookDao().findAllNotDeletedViews());
+    }
 
     /**
      * 查询书名包含关键词的未删除图书，匹配时忽略大小写。
@@ -134,6 +137,7 @@ public final class BookService {
      * @param keyword 书名关键词，查询前会去除首尾空白
      * @return 包含当前未归还数量的图书展示信息；没有匹配项时返回空列表
      * @throws BusinessException 关键词为 {@code null}、空字符串或仅包含空白字符
+     * @throws com.example.library.exception.StorageException 查询图书展示信息或数据库连接处理失败
      */
     public List<BookView> searchNotDeletedByTitle(String keyword) {
         if (keyword == null || keyword.isBlank()) {

@@ -99,8 +99,8 @@ public final class ConsoleUi {
         while (true) {
             InputResult<Integer> choice;
             if (admin) {
-                io.println("""                          
-                        
+                io.println("""
+
                         ===管理员===
                         1. 添加图书
                         2. 删除图书

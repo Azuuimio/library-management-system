@@ -68,7 +68,7 @@ public interface BookDao {
      * @return 受影响行数
      */
     int update(long id, String title, String author,
-                      BigDecimal price, int totalQuantity, long expectedVersion);
+               BigDecimal price, int totalQuantity, long expectedVersion);
 
     /**
      * 标记图书为已删除并递增版本号，调用前须锁定图书并通过业务和版本校验。

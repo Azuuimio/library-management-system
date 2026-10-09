@@ -10,17 +10,16 @@ import com.example.library.ui.ConsoleIo;
 import com.example.library.ui.ConsoleUi;
 
 import java.io.UncheckedIOException;
-import java.nio.file.Path;
 
 /**
- * 程序入口，依次初始化数据文件、加载并检查数据、组装业务对象，然后启动控制台界面。
+ * 程序入口，读取数据库连接配置、组装业务对象，然后启动控制台界面。
  */
 public final class LibraryApplication {
     private LibraryApplication() {
     }
 
     /**
-     * 使用当前工作目录下的 data 目录启动图书管理系统。
+     * 使用环境变量中的数据库连接配置启动图书管理系统。
      *
      * <p>捕获 {@link StorageException} 或 {@link UncheckedIOException} 时，
      * 显示原因并输出异常堆栈，以状态码 1 退出。
@@ -30,7 +29,6 @@ public final class LibraryApplication {
     public static void main(String[] args) {
         ConsoleIo io = new ConsoleIo();
         try {
-            Path directory = Path.of("data");
             JdbcExecutor executor = new JdbcExecutor(new ConnectionFactory());
             UserService userService = new UserService(executor);
             BookService bookService = new BookService(executor);

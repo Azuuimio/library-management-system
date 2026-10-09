@@ -6,7 +6,11 @@ import com.example.library.model.Book;
 import com.example.library.model.view.BookView;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -124,7 +128,7 @@ public final class JdbcBookDao implements BookDao {
                        b.version,
                        COUNT(r.id) AS unreturned_quantity
                 FROM books AS b
-                LEFT JOIN borrow_records AS r 
+                LEFT JOIN borrow_records AS r
                     ON b.id = r.book_id AND r.returned_at IS NULL
                 WHERE b.deleted = 0
                   AND LOWER(b.title) LIKE LOWER(?) ESCAPE '!'
@@ -212,7 +216,7 @@ public final class JdbcBookDao implements BookDao {
         }
     }
 
-    private  Book mapBook(ResultSet result) throws SQLException {
+    private Book mapBook(ResultSet result) throws SQLException {
         return new Book(
                 result.getLong("id"),
                 result.getString("title"),

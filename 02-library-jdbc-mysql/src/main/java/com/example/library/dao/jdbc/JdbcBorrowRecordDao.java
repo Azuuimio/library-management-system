@@ -5,7 +5,11 @@ import com.example.library.exception.StorageException;
 import com.example.library.model.BorrowRecord;
 import com.example.library.model.view.BorrowRecordView;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,8 +65,7 @@ public class JdbcBorrowRecordDao implements BorrowRecordDao {
                         mapRecord(result),
                         result.getString("username"),
                         result.getString("book_title"),
-                        result.getBoolean("book_deleted")
-                ));
+                        result.getBoolean("book_deleted")));
             }
             return List.copyOf(views);
         } catch (SQLException exception) {
@@ -96,8 +99,7 @@ public class JdbcBorrowRecordDao implements BorrowRecordDao {
                             mapRecord(result),
                             result.getString("username"),
                             result.getString("book_title"),
-                            result.getBoolean("book_deleted")
-                    ));
+                            result.getBoolean("book_deleted")));
                 }
                 return List.copyOf(views);
             }
@@ -192,7 +194,7 @@ public class JdbcBorrowRecordDao implements BorrowRecordDao {
                 result.getLong("record_id"),
                 result.getLong("user_id"),
                 result.getLong("book_id"),
-                result.getObject("borrowed_at",LocalDateTime.class),
+                result.getObject("borrowed_at", LocalDateTime.class),
                 result.getObject("returned_at", LocalDateTime.class));
     }
 }

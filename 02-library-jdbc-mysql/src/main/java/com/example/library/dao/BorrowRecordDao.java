@@ -38,6 +38,7 @@ public interface BorrowRecordDao {
      * @return 按借阅编号升序排列的该用户的借阅记录展示信息；没有记录时返回空列表
      */
     List<BorrowRecordView> findViewsByUserId(long userId);
+
     /**
      * 统计指定图书尚未归还的数量。
      *
