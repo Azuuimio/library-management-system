@@ -33,7 +33,7 @@ public final class BookService {
      * @param totalQuantity 非负的图书总数量
      * @return 保存后的图书，包含新分配的编号
      * @throws BusinessException 任一字段未通过校验
-     * @throws com.example.library.exception.StorageException 编号无法分配或保存失败
+     * @throws com.example.library.exception.StorageException 编号无法分配、保存图书失败，或数据库连接、事务处理失败
      */
     public Book add(String title, String author, BigDecimal price, int totalQuantity) {
         String normalizedTitle = BookValidator.validateAndNormalizeText(title, "书名");
@@ -53,7 +53,7 @@ public final class BookService {
      * @param bookId 要删除的图书编号
      * @param expectedVersion 确认删除前查看的图书版本号
      * @throws BusinessException 图书不存在、已删除、版本过期，或仍有未归还记录
-     * @throws com.example.library.exception.StorageException 保存删除状态失败
+     * @throws com.example.library.exception.StorageException 数据查询或保存删除状态失败，或数据库连接、事务处理失败
      */
     public void delete(long bookId, long expectedVersion) {
         executor.executeInTransaction(context -> {
@@ -78,13 +78,13 @@ public final class BookService {
      * 新的总数量不能小于该图书当前未归还的数量。
      *
      * @param bookId 要修改的图书编号
-     * @param title 新书名，去除首尾空白后须为 1 到 200 个 Unicode 码点
-     * @param author 新作者，去除首尾空白后须为 1 到 200 个 Unicode 码点
+     * @param title 新书名，规则见 {@link BookValidator#validateAndNormalizeText(String, String)}
+     * @param author 新作者，规则见 {@link BookValidator#validateAndNormalizeText(String, String)}
      * @param price 新价格，规则见 {@link BookValidator#validateAndNormalizePrice(BigDecimal)}
      * @param totalQuantity 新的非负总数量，包括已借出但未归还的数量
      * @param expectedVersion 输入修改值前查看的图书版本号
      * @throws BusinessException 图书不存在或已删除、版本过期、字段校验失败，或新总数量小于未归还数量
-     * @throws com.example.library.exception.StorageException 保存修改失败
+     * @throws com.example.library.exception.StorageException 数据查询或保存修改失败，或数据库连接、事务处理失败
      */
     public void update(long bookId, String title, String author,
                        BigDecimal price, int totalQuantity, long expectedVersion) {

@@ -223,8 +223,8 @@ public final class ConsoleUi {
     /**
      * 展示图书当前信息并读取修改值，空输入保留对应字段的当前值。
      *
-     * <p>数量输入代表总数，小于当前未归还数量时重新输入，保存前仍由业务层校验。
-     * 提交查看时的版本号，业务层在事务中锁定图书后检查版本和最新未归还数量。
+     * <p>数量输入代表总数，空输入保留查看时的值。
+     * 提交查看时的版本号，由业务层在事务中锁定图书，检查版本和最新未归还数量。
      *
      * @return 输入编号时取消则返回取消状态，任一输入位置遇到输入流结束则返回结束状态；
      *         修改成功或业务失败提示已显示时返回完成状态
@@ -253,16 +253,9 @@ public final class ConsoleUi {
             if (price.status() != InteractionStatus.COMPLETED) {
                 return price.status();
             }
-            InputResult<Integer> quantity;
-            while (true) {
-                quantity = io.readQuantity("总数 [" + book.totalQuantity() + "]：", book.totalQuantity());
-                if (quantity.status() != InteractionStatus.COMPLETED) {
-                    return quantity.status();
-                }
-                if (quantity.value() >= current.unreturnedQuantity()) {
-                    break;
-                }
-                io.println("总数不能小于当前未归还数量，请重新输入。");
+            InputResult<Integer> quantity = io.readQuantity("总数 [" + book.totalQuantity() + "]：", book.totalQuantity());
+            if (quantity.status() != InteractionStatus.COMPLETED) {
+                return quantity.status();
             }
             bookService.update(bookId.value(), title.value(), author.value(), price.value(), quantity.value(), book.version());
             io.println("修改成功。");

@@ -45,7 +45,7 @@ public interface BookDao {
     List<BookView> searchNotDeletedViewsByTitle(String keyword);
 
     /**
-     * 保存新图书，由数据库分配编号，并将删除标记和版本号设为默认值。
+     * 保存新图书，由数据库分配编号，删除标记初始为 {@code false}，版本号初始为 {@code 0}。
      *
      * @param title 已校验并去除首尾空白的书名
      * @param author 已校验并去除首尾空白的作者

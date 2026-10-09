@@ -33,7 +33,7 @@ public final class BorrowRecordService {
      * @param bookId 要借阅的图书编号
      * @return 新建的借阅记录，借阅时间取当前本地时间并截去不足一秒的部分
      * @throws BusinessException 图书不存在或已删除、该读者仍有此书未归还，或没有可借数量
-     * @throws StorageException 编号无法分配或保存借阅记录失败
+     * @throws StorageException 编号无法分配、数据查询或保存借阅记录失败，或数据库连接、事务处理失败
      */
     public BorrowRecord borrowBook(User currentUser, long bookId) {
         return executor.executeInTransaction(context -> {
@@ -58,13 +58,15 @@ public final class BorrowRecordService {
      * @param currentUser 已登录的读者，由调用方保证不为 {@code null} 且角色为读者
      * @param recordId 借阅记录编号
      * @throws BusinessException 记录不存在、不属于当前读者、已经归还，或当前时间早于借阅时间
-     * @throws StorageException 保存归还时间失败
+     * @throws StorageException 数据查询或保存归还时间失败，或数据库连接、事务处理失败
      */
     public void returnBook(User currentUser, long recordId) {
         executor.executeInTransaction(context -> {
+            // 先查询借阅记录，确定需要锁定的图书。
             BorrowRecord first = findOwnedById(context.borrowRecordDao(), recordId, currentUser.id());
             context.bookDao().findByIdForUpdate(first.bookId())
                     .orElseThrow(() -> new StorageException("借阅记录关联的图书不存在"));
+            // 等待图书锁期间归还状态可能变化，取得锁后重新查询。
             BorrowRecord current = findOwnedById(context.borrowRecordDao(), recordId, currentUser.id());
             if (current.isReturned()) {
                 throw new BusinessException("这条借阅记录已经归还，不能重复归还");
@@ -84,7 +86,7 @@ public final class BorrowRecordService {
      * 查询全部借阅记录，并补充当前账号名称、书名和图书删除标记。
      *
      * @return 包括已归还和未归还记录的展示信息；没有记录时返回空列表
-     * @throws StorageException 查询借阅展示信息失败
+     * @throws StorageException 查询借阅展示信息或数据库连接处理失败
      */
     public List<BorrowRecordView> findAll() {
         return executor.executeQuery(context -> context.borrowRecordDao().findAllViews());
@@ -95,7 +97,7 @@ public final class BorrowRecordService {
      *
      * @param currentUser 已登录的用户，由调用方保证不为 {@code null}
      * @return 该用户已归还和未归还记录的展示信息；没有记录时返回空列表
-     * @throws StorageException 查询借阅展示信息失败
+     * @throws StorageException 查询借阅展示信息或数据库连接处理失败
      */
     public List<BorrowRecordView> findByUser(User currentUser) {
         return executor.executeQuery(context -> context.borrowRecordDao().findViewsByUserId(currentUser.id()));
