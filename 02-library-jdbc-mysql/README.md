@@ -2,7 +2,7 @@
 
 ## 技术栈
 
-Java SE + JDBC + MySQL，使用 Maven 管理依赖与构建。
+Java SE + JDBC + MySQL + Maven
 
 ## 功能说明
 
@@ -39,10 +39,10 @@ Java SE + JDBC + MySQL，使用 Maven 管理依赖与构建。
 
 ### 初始化数据库
 
-启动 MySQL 服务，在 `02-library-jdbc-mysql` 目录下使用 PowerShell 连接数据库：
+在 `02-library-jdbc-mysql` 目录下使用 PowerShell 启动 MySQL 服务：
 
 ```powershell
-mysql --default-character-set=utf8mb4 -u root -p
+mysql -u root -p
 ```
 
 按提示输入 MySQL 密码，然后在同一个 MySQL 会话中依次执行：
@@ -60,15 +60,15 @@ SOURCE sql/data.sql;
 | -------- | --- |
 | LIBRARY_DB_URL | jdbc:mysql://localhost:3306/library_jdbc |
 | LIBRARY_DB_USER | MySQL 账号 |
-| LIBRARY_DB_PASSWORD | MySQL 账号的密码 |
+| LIBRARY_DB_PASSWORD | MySQL 密码 |
 
 ### 编译与启动
 
 **方式一：IDEA 启动**
 
 1. 使用 IDEA 打开 `02-library-jdbc-mysql` 目录，将 `pom.xml` 导入为 Maven 工程并加载依赖。
-3. 为 `com.example.library.LibraryApplication` 创建 Application 运行配置，在该配置的环境变量中填写上述三个变量。
-4. 打开 `src/main/java/com/example/library/LibraryApplication.java`，运行 `main` 方法。
+2. 为 `com.example.library.LibraryApplication` 创建 Application 运行配置，在该配置的环境变量中填写上述三个变量。
+3. 打开 `src/main/java/com/example/library/LibraryApplication.java`，运行 `main` 方法。
 
 **方式二：命令行启动**
 
@@ -81,7 +81,7 @@ SOURCE sql/data.sql;
    [Console]::InputEncoding = $utf8
    [Console]::OutputEncoding = $utf8
    $env:LIBRARY_DB_URL = 'jdbc:mysql://localhost:3306/library_jdbc'
-   $env:LIBRARY_DB_USER = 'root'
+   $env:LIBRARY_DB_USER = '你的 MySQL 账号'
    $env:LIBRARY_DB_PASSWORD = '你的 MySQL 密码'
    ```
    
@@ -100,15 +100,21 @@ SOURCE sql/data.sql;
 ## 项目结构
 
 ```text
-com.example.library
-├── LibraryApplication  # 程序入口、读取连接配置与对象组装
-├── model               # 领域模型
-│   └── view            # 展示所需的组合数据
-├── dao                 # 数据访问接口
-│   └── jdbc            # JDBC 存储实现
-├── db                  # 数据库连接创建与事务管理
-├── service             # 业务逻辑
-├── ui                  # 控制台交互
-├── validation          # 图书字段校验
-└── exception           # 业务与存储异常
+02-library-jdbc-mysql/
+├── README.md                           # 项目说明与运行指南
+├── pom.xml                             # Maven 依赖与构建配置
+├── sql/
+│   ├── schema.sql                      # 创建数据库与表结构
+│   └── data.sql                        # 初始化预制账号
+└── src/main/java/com/example/library/
+    ├── LibraryApplication.java         # 程序入口、读取连接配置与对象组装
+    ├── model/                          # 领域模型
+    │   └── view/                       # 展示所需的组合数据
+    ├── dao/                            # 数据访问接口
+    │   └── jdbc/                       # JDBC 存储实现
+    ├── db/                             # 数据库连接创建与事务管理
+    ├── service/                        # 业务逻辑
+    ├── ui/                             # 控制台交互
+    ├── validation/                     # 图书字段校验
+    └── exception/                      # 业务与存储异常
 ```

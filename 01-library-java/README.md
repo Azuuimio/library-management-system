@@ -9,13 +9,13 @@ Java SE
 **已完成功能**
 
 - 实现基础的图书管理业务功能。
-- 使用 CSV 文件进行数据持久化。
+- 使用 CSV 文件实现数据持久化。
 
 **本阶段限制**
 
 - 仅提供控制台交互界面。
-- 不支持并发读写。
 - 使用无密码预制账号，暂未提供注册及面向用户的账号管理功能。
+- 不支持并发读写。
 
 预制账号如下：
 
@@ -68,14 +68,16 @@ Java SE
 ## 项目结构
 
 ```text
-com.example.library
-├── LibraryApplication  # 程序入口、数据初始化与对象组装
-├── model               # 领域模型
-│   └── view            # 展示所需的组合数据
-├── dao                 # 数据访问接口
-│   └── csv             # CSV 存储实现
-├── service             # 业务逻辑
-├── ui                  # 控制台交互
-├── validation          # 图书字段校验
-└── exception           # 业务与存储异常
+01-library-java/
+├── README.md                       # 项目说明与运行指南
+└── src/com/example/library/
+    ├── LibraryApplication.java     # 程序入口、数据初始化与对象组装
+    ├── model/                      # 领域模型
+    │   └── view/                   # 展示所需的组合数据
+    ├── dao/                        # 数据访问接口
+    │   └── csv/                    # CSV 存储实现
+    ├── service/                    # 业务逻辑
+    ├── ui/                         # 控制台交互
+    ├── validation/                 # 图书字段校验
+    └── exception/                  # 业务与存储异常
 ```
