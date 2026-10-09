@@ -61,7 +61,7 @@ SOURCE sql/data.sql;
 | -------- | --- |
 | LIBRARY_DB_URL | jdbc:mysql://localhost:3306/library_jdbc |
 | LIBRARY_DB_USER | MySQL 账号 |
-| LIBRARY_DB_PASSWORD | MySQL 账号的密码 |
+| LIBRARY_DB_PASSWORD | MySQL 密码 |
 
 ### 编译与启动
 
@@ -82,7 +82,7 @@ SOURCE sql/data.sql;
    [Console]::InputEncoding = $utf8
    [Console]::OutputEncoding = $utf8
    $env:LIBRARY_DB_URL = 'jdbc:mysql://localhost:3306/library_jdbc'
-   $env:LIBRARY_DB_USER = 'root'
+   $env:LIBRARY_DB_USER = '你的 MySQL 账号·'
    $env:LIBRARY_DB_PASSWORD = '你的 MySQL 密码'
    ```
    
