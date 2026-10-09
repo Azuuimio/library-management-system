@@ -68,8 +68,8 @@ SOURCE sql/data.sql;
 **方式一：IDEA 启动**
 
 1. 使用 IDEA 打开 `02-library-jdbc-mysql` 目录，将 `pom.xml` 导入为 Maven 工程并加载依赖。
-3. 为 `com.example.library.LibraryApplication` 创建 Application 运行配置，在该配置的环境变量中填写上述三个变量。
-4. 打开 `src/main/java/com/example/library/LibraryApplication.java`，运行 `main` 方法。
+2. 为 `com.example.library.LibraryApplication` 创建 Application 运行配置，在该配置的环境变量中填写上述三个变量。
+3. 打开 `src/main/java/com/example/library/LibraryApplication.java`，运行 `main` 方法。
 
 **方式二：命令行启动**
 
@@ -82,7 +82,7 @@ SOURCE sql/data.sql;
    [Console]::InputEncoding = $utf8
    [Console]::OutputEncoding = $utf8
    $env:LIBRARY_DB_URL = 'jdbc:mysql://localhost:3306/library_jdbc'
-   $env:LIBRARY_DB_USER = '你的 MySQL 账号·'
+   $env:LIBRARY_DB_USER = '你的 MySQL 账号'
    $env:LIBRARY_DB_PASSWORD = '你的 MySQL 密码'
    ```
    
