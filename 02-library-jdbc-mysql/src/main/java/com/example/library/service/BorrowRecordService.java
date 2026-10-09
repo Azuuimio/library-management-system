@@ -1,8 +1,6 @@
 package com.example.library.service;
 
-import com.example.library.dao.BookDao;
 import com.example.library.dao.BorrowRecordDao;
-import com.example.library.dao.UserDao;
 import com.example.library.db.JdbcExecutor;
 import com.example.library.exception.BusinessException;
 import com.example.library.exception.StorageException;
