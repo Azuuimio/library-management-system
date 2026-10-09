@@ -102,6 +102,7 @@ public final class JdbcBookDao implements BookDao {
             while (result.next()) {
                 views.add(mapView(result));
             }
+            return List.copyOf(views);
         } catch (SQLException exception) {
             throw new StorageException("查询图书展示信息列表失败", exception);
         }

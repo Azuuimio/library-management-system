@@ -64,6 +64,7 @@ public class JdbcBorrowRecordDao implements BorrowRecordDao {
                         result.getBoolean("book_deleted")
                 ));
             }
+            return List.copyOf(views);
         } catch (SQLException exception) {
             throw new StorageException("查询借阅展示信息失败", exception);
         }
