@@ -102,8 +102,8 @@ SOURCE sql/data.sql;
 
 ```text
 02-library-jdbc-mysql/
-├── pom.xml                             # Maven 依赖与构建配置
 ├── README.md                           # 项目说明与运行指南
+├── pom.xml                             # Maven 依赖与构建配置
 ├── sql/
 │   ├── schema.sql                      # 创建数据库与表结构
 │   └── data.sql                        # 初始化预制账号
