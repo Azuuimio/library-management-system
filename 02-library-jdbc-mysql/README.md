@@ -2,8 +2,7 @@
 
 ## 技术栈
 
-- Java SE + JDBC + MySQL
-- 使用 Maven 管理依赖与构建
+Java SE + JDBC + MySQL + Maven
 
 ## 功能说明
 
