@@ -101,15 +101,21 @@ SOURCE sql/data.sql;
 ## 项目结构
 
 ```text
-com.example.library
-├── LibraryApplication  # 程序入口、读取连接配置与对象组装
-├── model               # 领域模型
-│   └── view            # 展示所需的组合数据
-├── dao                 # 数据访问接口
-│   └── jdbc            # JDBC 存储实现
-├── db                  # 数据库连接创建与事务管理
-├── service             # 业务逻辑
-├── ui                  # 控制台交互
-├── validation          # 图书字段校验
-└── exception           # 业务与存储异常
+02-library-jdbc-mysql/
+├── pom.xml                             # Maven 依赖与构建配置
+├── README.md                           # 项目说明与运行指南
+├── sql/
+│   ├── schema.sql                      # 创建数据库与表结构
+│   └── data.sql                        # 初始化预制账号
+└── src/main/java/com/example/library/
+    ├── LibraryApplication.java         # 程序入口、读取连接配置与对象组装
+    ├── model/                          # 领域模型
+    │   └── view/                       # 展示所需的组合数据
+    ├── dao/                            # 数据访问接口
+    │   └── jdbc/                       # JDBC 存储实现
+    ├── db/                             # 数据库连接创建与事务管理
+    ├── service/                        # 业务逻辑
+    ├── ui/                             # 控制台交互
+    ├── validation/                     # 图书字段校验
+    └── exception/                      # 业务与存储异常
 ```
