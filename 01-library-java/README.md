@@ -2,7 +2,7 @@
 
 ## 技术栈
 
-- Java SE
+Java SE
 
 ## 功能说明
 
