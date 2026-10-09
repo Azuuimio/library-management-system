@@ -48,7 +48,8 @@ public final class ConsoleUi {
      *
      * <p>退出登录后返回登录菜单；选择退出程序或输入流结束时，此方法返回。
      *
-     * @throws com.example.library.exception.StorageException 操作中发生数据读写或关联错误
+     * @throws com.example.library.exception.StorageException 操作中发生数据读写或关联错误，
+     *                                                       或数据库连接、事务处理失败
      * @throws java.io.UncheckedIOException 读取控制台输入失败
      */
     public void run() {

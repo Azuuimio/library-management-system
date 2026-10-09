@@ -18,7 +18,7 @@ import java.util.Optional;
 /**
  * 通过当前连接保存借阅记录，使用联表查询生成展示信息，连接由执行器管理。
  */
-public class JdbcBorrowRecordDao implements BorrowRecordDao {
+public final class JdbcBorrowRecordDao implements BorrowRecordDao {
     private final Connection connection;
 
     public JdbcBorrowRecordDao(Connection connection) {

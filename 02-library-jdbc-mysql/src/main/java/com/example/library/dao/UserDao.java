@@ -13,6 +13,7 @@ public interface UserDao {
      *
      * @param username 已由调用方去除首尾空白的账号名称
      * @return 找到时返回包含该用户的 {@link Optional}；找不到时返回 {@link Optional#empty()}
+     * @throws com.example.library.exception.StorageException 查询用户失败
      */
     Optional<User> findByUsername(String username);
 }
