@@ -1,10 +1,7 @@
 package com.example.library;
 
-import com.example.library.dao.csv.CsvBookDao;
-import com.example.library.dao.csv.CsvBorrowRecordDao;
-import com.example.library.dao.csv.CsvDataValidator;
-import com.example.library.dao.csv.CsvInitializer;
-import com.example.library.dao.csv.CsvUserDao;
+import com.example.library.db.ConnectionFactory;
+import com.example.library.db.JdbcExecutor;
 import com.example.library.exception.StorageException;
 import com.example.library.service.BookService;
 import com.example.library.service.BorrowRecordService;
@@ -34,14 +31,10 @@ public final class LibraryApplication {
         ConsoleIo io = new ConsoleIo();
         try {
             Path directory = Path.of("data");
-            CsvInitializer.initialize(directory);
-            CsvUserDao userDao = new CsvUserDao(directory);
-            CsvBookDao bookDao = new CsvBookDao(directory);
-            CsvBorrowRecordDao borrowRecordDao = new CsvBorrowRecordDao(directory);
-            CsvDataValidator.validate(userDao, bookDao, borrowRecordDao);
-            UserService userService = new UserService(userDao);
-            BookService bookService = new BookService(bookDao, borrowRecordDao);
-            BorrowRecordService borrowRecordService = new BorrowRecordService(bookDao, borrowRecordDao, userDao);
+            JdbcExecutor executor = new JdbcExecutor(new ConnectionFactory());
+            UserService userService = new UserService(executor);
+            BookService bookService = new BookService(executor);
+            BorrowRecordService borrowRecordService = new BorrowRecordService(executor);
             new ConsoleUi(io, userService, bookService, borrowRecordService).run();
         } catch (StorageException | UncheckedIOException exception) {
             io.println("程序停止：" + exception.getMessage());
