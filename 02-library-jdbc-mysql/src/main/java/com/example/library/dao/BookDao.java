@@ -18,6 +18,7 @@ public interface BookDao {
      *
      * @param id 图书编号
      * @return 找到时返回包含该图书的 {@link Optional}；找不到时返回 {@link Optional#empty()}
+     * @throws com.example.library.exception.StorageException 锁定或查询图书失败
      */
     Optional<Book> findByIdForUpdate(long id);
 
@@ -26,6 +27,7 @@ public interface BookDao {
      *
      * @param id 图书编号
      * @return 找到时返回包含该图书展示信息的 {@link Optional}；不存在或已删除时返回 {@link Optional#empty()}
+     * @throws com.example.library.exception.StorageException 查询图书展示信息失败
      */
     Optional<BookView> findNotDeletedViewById(long id);
 
@@ -33,6 +35,7 @@ public interface BookDao {
      * 按图书编号升序查询全部未删除的图书及当前未归还数量。
      *
      * @return 未删除的图书展示信息列表；没有符合条件的图书时返回空列表
+     * @throws com.example.library.exception.StorageException 查询图书展示信息失败
      */
     List<BookView> findAllNotDeletedViews();
 
@@ -41,6 +44,7 @@ public interface BookDao {
      *
      * @param keyword 已由调用方去除首尾空白的关键词，不能为 {@code null} 或空字符串
      * @return 匹配的图书展示信息列表；没有匹配项时返回空列表
+     * @throws com.example.library.exception.StorageException 按书名搜索图书失败
      */
     List<BookView> searchNotDeletedViewsByTitle(String keyword);
 
@@ -66,6 +70,7 @@ public interface BookDao {
      * @param totalQuantity 已校验且不小于未归还数量的总数量
      * @param expectedVersion 用户查看图书时的版本号
      * @return 受影响行数
+     * @throws com.example.library.exception.StorageException 保存图书修改失败
      */
     int update(long id, String title, String author,
                BigDecimal price, int totalQuantity, long expectedVersion);
@@ -76,6 +81,7 @@ public interface BookDao {
      * @param id 图书编号
      * @param expectedVersion 用户确认删除前查看的版本号
      * @return 受影响行数
+     * @throws com.example.library.exception.StorageException 保存图书删除状态失败
      */
     int markDeleted(long id, long expectedVersion);
 }
