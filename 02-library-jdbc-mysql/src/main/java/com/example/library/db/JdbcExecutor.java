@@ -28,7 +28,7 @@ public final class JdbcExecutor {
      * @param bookDao 图书查询和保存接口
      * @param borrowRecordDao 借阅记录查询和保存接口
      */
-    public record DaoContext (UserDao userDao, BookDao bookDao, BorrowRecordDao borrowRecordDao) {
+    public record DaoContext(UserDao userDao, BookDao bookDao, BorrowRecordDao borrowRecordDao) {
     }
 
     public JdbcExecutor(ConnectionFactory connectionFactory) {
@@ -69,10 +69,9 @@ public final class JdbcExecutor {
      * @param <T> 回调结果类型
      * @return 事务提交且连接关闭后的业务结果
      * @throws BusinessException 业务检查未通过，且回滚和关闭正常
-     * @throws StorageException 事务提交异常，事务回滚失败，或数据库连接创建、配置、关闭失败；
+     * @throws StorageException 数据库操作、事务提交或回滚失败，或数据库连接创建、配置、关闭失败
      */
     public <T> T executeInTransaction(Function<DaoContext, T> work) {
-        boolean committed = false;
         try (Connection connection = connectionFactory.open()) {
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             connection.setAutoCommit(false);

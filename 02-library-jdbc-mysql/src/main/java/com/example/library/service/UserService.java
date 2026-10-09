@@ -20,12 +20,13 @@ public final class UserService {
      * @param username 用户输入的账号名称，匹配时区分大小写
      * @return 登录成功的用户，包含编号和角色
      * @throws BusinessException 账号为 {@code null}、空字符串或仅包含空白字符，或对应用户不存在
+     * @throws com.example.library.exception.StorageException 查询用户或数据库连接处理失败
      */
     public User login(String username) {
         if (username == null || username.isBlank()) {
             throw new BusinessException("账号不能为空");
         }
         return executor.executeQuery(context -> context.userDao().findByUsername(username.strip())
-                        .orElseThrow(() -> new BusinessException("账号不存在，请输入预制账号")));
+                .orElseThrow(() -> new BusinessException("账号不存在，请输入预制账号")));
     }
 }
