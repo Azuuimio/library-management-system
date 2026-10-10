@@ -15,6 +15,6 @@ public record BookView(Book book, long unreturnedQuantity) {
      * @return 两者的差值；此方法不校验数量，也不将负数改为零
      */
     public long availableQuantity() {
-        return book.totalQuantity() - unreturnedQuantity;
+        return book.getTotalQuantity() - unreturnedQuantity;
     }
 }

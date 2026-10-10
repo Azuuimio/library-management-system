@@ -91,12 +91,12 @@ public final class ConsoleUi {
             io.println("登录失败：" + exception.getMessage());
             return pressEnterToContinue();
         }
-        io.println("登录成功，欢迎 " + escapeControlChars(currentUser.username()) + "。");
+        io.println("登录成功，欢迎 " + escapeControlChars(currentUser.getUsername()) + "。");
         return menu(currentUser);
     }
 
     private InteractionStatus menu(User currentUser) {
-        boolean admin = currentUser.role() == Role.ADMIN;
+        boolean admin = currentUser.getRole() == Role.ADMIN;
         while (true) {
             InputResult<Integer> choice;
             if (admin) {
@@ -190,7 +190,7 @@ public final class ConsoleUi {
                 return quantity.status();
             }
             Book book = bookService.add(title.value(), author.value(), price.value(), quantity.value());
-            io.println("添加成功。图书编号：" + book.id());
+            io.println("添加成功。图书编号：" + book.getId());
         } catch (BusinessException exception) {
             io.println("添加失败：" + exception.getMessage());
         }
@@ -205,12 +205,12 @@ public final class ConsoleUi {
                 return bookId.status();
             }
             Book book = bookService.findById(bookId.value()).book();
-            InputResult<Boolean> confirmed = io.confirm("确认删除图书：" + escapeControlChars(book.title()));
+            InputResult<Boolean> confirmed = io.confirm("确认删除图书：" + escapeControlChars(book.getTitle()));
             if (confirmed.status() != InteractionStatus.COMPLETED) {
                 return confirmed.status();
             }
             if (confirmed.value()) {
-                bookService.delete(bookId.value(), book.version());
+                bookService.delete(bookId.value(), book.getVersion());
                 io.println("删除成功。");
             } else {
                 io.println("已取消删除。");
@@ -242,23 +242,23 @@ public final class ConsoleUi {
             io.println("当前信息：");
             showBook(current);
             io.println("直接回车保留当前值。");
-            InputResult<String> title = io.readText("书名 [" + escapeControlChars(book.title()) + "]：", "书名", book.title());
+            InputResult<String> title = io.readText("书名 [" + escapeControlChars(book.getTitle()) + "]：", "书名", book.getTitle());
             if (title.status() != InteractionStatus.COMPLETED) {
                 return title.status();
             }
-            InputResult<String> author = io.readText("作者 [" + escapeControlChars(book.author()) + "]：", "作者", book.author());
+            InputResult<String> author = io.readText("作者 [" + escapeControlChars(book.getAuthor()) + "]：", "作者", book.getAuthor());
             if (author.status() != InteractionStatus.COMPLETED) {
                 return author.status();
             }
-            InputResult<BigDecimal> price = io.readPrice("价格 [" + book.price().toPlainString() + "]：", book.price());
+            InputResult<BigDecimal> price = io.readPrice("价格 [" + book.getPrice().toPlainString() + "]：", book.getPrice());
             if (price.status() != InteractionStatus.COMPLETED) {
                 return price.status();
             }
-            InputResult<Integer> quantity = io.readQuantity("总数 [" + book.totalQuantity() + "]：", book.totalQuantity());
+            InputResult<Integer> quantity = io.readQuantity("总数 [" + book.getTotalQuantity() + "]：", book.getTotalQuantity());
             if (quantity.status() != InteractionStatus.COMPLETED) {
                 return quantity.status();
             }
-            bookService.update(bookId.value(), title.value(), author.value(), price.value(), quantity.value(), book.version());
+            bookService.update(bookId.value(), title.value(), author.value(), price.value(), quantity.value(), book.getVersion());
             io.println("修改成功。");
         } catch (BusinessException exception) {
             io.println("修改失败：" + exception.getMessage());
@@ -280,7 +280,7 @@ public final class ConsoleUi {
                 return bookId.status();
             }
             BorrowRecord record = borrowRecordService.borrowBook(currentUser, bookId.value());
-            io.println("借阅成功。借阅记录编号：" + record.id());
+            io.println("借阅成功。借阅记录编号：" + record.getId());
         } catch (BusinessException exception) {
             io.println("借阅失败：" + exception.getMessage());
         }
@@ -341,11 +341,11 @@ public final class ConsoleUi {
 
     private void showBook(BookView view) {
         Book book = view.book();
-        io.println("图书编号：" + book.id()
-                + " | 书名：" + escapeControlChars(book.title())
-                + " | 作者：" + escapeControlChars(book.author())
-                + " | 价格：" + book.price().toPlainString()
-                + " | 总数：" + book.totalQuantity()
+        io.println("图书编号：" + book.getId()
+                + " | 书名：" + escapeControlChars(book.getTitle())
+                + " | 作者：" + escapeControlChars(book.getAuthor())
+                + " | 价格：" + book.getPrice().toPlainString()
+                + " | 总数：" + book.getTotalQuantity()
                 + " | 借出：" + view.unreturnedQuantity()
                 + " | 可借：" + view.availableQuantity());
     }
@@ -358,12 +358,12 @@ public final class ConsoleUi {
         for (BorrowRecordView view : records) {
             BorrowRecord borrowRecord = view.borrowRecord();
             String returnedText = borrowRecord.isReturned()
-                    ? DATE_TIME_FORMATTER.format(borrowRecord.returnedAt())
+                    ? DATE_TIME_FORMATTER.format(borrowRecord.getReturnedAt())
                     : "未归还";
-            io.println("借阅记录编号：" + borrowRecord.id() + " | 读者：" + escapeControlChars(view.username())
-                    + " | 图书：" + borrowRecord.bookId() + " / " + escapeControlChars(view.bookTitle())
+            io.println("借阅记录编号：" + borrowRecord.getId() + " | 读者：" + escapeControlChars(view.username())
+                    + " | 图书：" + borrowRecord.getBookId() + " / " + escapeControlChars(view.bookTitle())
                     + (view.bookDeleted() ? "（已删除）" : "")
-                    + " | 借阅：" + DATE_TIME_FORMATTER.format(borrowRecord.borrowedAt())
+                    + " | 借阅：" + DATE_TIME_FORMATTER.format(borrowRecord.getBorrowedAt())
                     + " | 归还：" + returnedText);
         }
         io.println("共 " + records.size() + " 条借阅记录。");
