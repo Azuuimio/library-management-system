@@ -37,15 +37,15 @@ public final class BorrowRecordService {
      */
     public BorrowRecord borrowBook(User currentUser, long bookId) {
         return executor.executeInTransaction(context -> {
-            Book book = context.bookDao().findByIdForUpdate(bookId).filter(value -> !value.deleted())
+            Book book = context.bookDao().findByIdForUpdate(bookId).filter(value -> !value.isDeleted())
                     .orElseThrow(() -> new BusinessException("图书不存在或已删除"));
-            if (context.borrowRecordDao().existsUnreturned(currentUser.id(), bookId)) {
+            if (context.borrowRecordDao().existsUnreturned(currentUser.getId(), bookId)) {
                 throw new BusinessException("你已借阅此书，请先归还再借阅");
             }
-            if (context.borrowRecordDao().countUnreturnedByBookId(bookId) >= book.totalQuantity()) {
+            if (context.borrowRecordDao().countUnreturnedByBookId(bookId) >= book.getTotalQuantity()) {
                 throw new BusinessException("库存不足，暂时无法借阅");
             }
-            return context.borrowRecordDao().insert(currentUser.id(), bookId, now());
+            return context.borrowRecordDao().insert(currentUser.getId(), bookId, now());
         });
     }
 
@@ -63,19 +63,19 @@ public final class BorrowRecordService {
     public void returnBook(User currentUser, long recordId) {
         executor.executeInTransaction(context -> {
             // 先查询借阅记录，确定需要锁定的图书。
-            BorrowRecord first = findOwnedById(context.borrowRecordDao(), recordId, currentUser.id());
-            context.bookDao().findByIdForUpdate(first.bookId())
+            BorrowRecord first = findOwnedById(context.borrowRecordDao(), recordId, currentUser.getId());
+            context.bookDao().findByIdForUpdate(first.getBookId())
                     .orElseThrow(() -> new StorageException("借阅记录关联的图书不存在"));
             // 等待图书锁期间归还状态可能变化，取得锁后重新查询。
-            BorrowRecord current = findOwnedById(context.borrowRecordDao(), recordId, currentUser.id());
+            BorrowRecord current = findOwnedById(context.borrowRecordDao(), recordId, currentUser.getId());
             if (current.isReturned()) {
                 throw new BusinessException("这条借阅记录已经归还，不能重复归还");
             }
             LocalDateTime returnedAt = now();
-            if (returnedAt.isBefore(current.borrowedAt())) {
+            if (returnedAt.isBefore(current.getBorrowedAt())) {
                 throw new BusinessException("当前系统时间早于借阅时间，请校准时钟后重试");
             }
-            if (context.borrowRecordDao().markReturnedIfUnreturned(recordId, currentUser.id(), returnedAt) != 1) {
+            if (context.borrowRecordDao().markReturnedIfUnreturned(recordId, currentUser.getId(), returnedAt) != 1) {
                 throw new StorageException("归还图书的受影响行数异常");
             }
             return null;
@@ -100,12 +100,12 @@ public final class BorrowRecordService {
      * @throws StorageException 查询借阅展示信息或数据库连接处理失败
      */
     public List<BorrowRecordView> findByUser(User currentUser) {
-        return executor.executeQuery(context -> context.borrowRecordDao().findViewsByUserId(currentUser.id()));
+        return executor.executeQuery(context -> context.borrowRecordDao().findViewsByUserId(currentUser.getId()));
     }
 
     private BorrowRecord findOwnedById(BorrowRecordDao borrowRecordDao, long recordId, long userId) {
         return borrowRecordDao.findById(recordId)
-                .filter(borrowRecord -> borrowRecord.userId() == userId)
+                .filter(borrowRecord -> borrowRecord.getUserId() == userId)
                 .orElseThrow(() -> new BusinessException("借阅记录不存在或不属于当前读者"));
     }
 

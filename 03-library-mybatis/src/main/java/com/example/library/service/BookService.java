@@ -58,7 +58,7 @@ public final class BookService {
     public void delete(long bookId, long expectedVersion) {
         executor.executeInTransaction(context -> {
             Book book = findNotDeletedByIdForUpdate(context.bookDao(), bookId);
-            if (book.version() != expectedVersion) {
+            if (book.getVersion() != expectedVersion) {
                 throw new BusinessException("图书信息已变化，请重新查看后删除");
             }
             if (context.borrowRecordDao().countUnreturnedByBookId(bookId) != 0) {
@@ -94,7 +94,7 @@ public final class BookService {
         int validatedQuantity = BookValidator.validateQuantity(totalQuantity);
         executor.executeInTransaction(context -> {
             Book book = findNotDeletedByIdForUpdate(context.bookDao(), bookId);
-            if (book.version() != expectedVersion) {
+            if (book.getVersion() != expectedVersion) {
                 throw new BusinessException("图书信息已变化，请重新查看后修改");
             }
             if (validatedQuantity < context.borrowRecordDao().countUnreturnedByBookId(bookId)) {
@@ -147,7 +147,7 @@ public final class BookService {
     }
 
     private Book findNotDeletedByIdForUpdate(BookDao bookDao, long bookId) {
-        return bookDao.findByIdForUpdate(bookId).filter(book -> !book.deleted())
+        return bookDao.findByIdForUpdate(bookId).filter(book -> !book.isDeleted())
                 .orElseThrow(() -> new BusinessException("图书不存在或已删除"));
     }
 }
