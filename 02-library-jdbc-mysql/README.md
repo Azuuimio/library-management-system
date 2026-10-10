@@ -39,7 +39,7 @@ Java SE + JDBC + MySQL + Maven
 
 ### 初始化数据库
 
-启动 MySQL 服务，在 `02-library-jdbc-mysql` 目录下使用 PowerShell 连接数据库：
+在 `02-library-jdbc-mysql` 目录下使用 PowerShell 启动 MySQL 服务：
 
 ```powershell
 mysql -u root -p
