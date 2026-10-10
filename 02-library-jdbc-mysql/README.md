@@ -66,7 +66,7 @@ SOURCE sql/data.sql;
 
 **方式一：IDEA 启动**
 
-1. 使用 IDEA 打开 `02-library-jdbc-mysql` 目录，将 `pom.xml` 导入为 Maven 工程并加载依赖。
+1. 使用 IDEA 打开 `02-library-jdbc-mysql` 目录。
 2. 为 `com.example.library.LibraryApplication` 创建 Application 运行配置，在该配置的环境变量中填写上述三个变量。
 3. 打开 `src/main/java/com/example/library/LibraryApplication.java`，运行 `main` 方法。
 
