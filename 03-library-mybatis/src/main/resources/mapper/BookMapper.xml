@@ -1,1 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.library.mapper.BookMapper">
+    <resultMap id="bookMap" type="com.example.library.model.Book" autoMapping="false">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="author" column="author"/>
+        <result property="price" column="price"/>
+        <result property="totalQuantity" column="total_quantity"/>
+        <result property="deleted" column="deleted"/>
+        <result property="version" column="version"/>
+    </resultMap>
 
+    <resultMap id="bookViewMap" type="com.example.library.model.view.BookView" autoMapping="false">
+        <constructor>
+            <arg name="book" javaType="com.example.library.model.Book" resultMap="bookMap"/>
+            <arg name="unreturnedQuantity" javaType="_long" column="unreturned_quantity"/>
+        </constructor>
+        <id property="book.id" column="id" javaType="_long"/>
+    </resultMap>
+
+    <select id="findByIdForUpdate" resultMap="bookMap">
+        SELECT id, title, author, price, total_quantity, deleted, version
+        FROM books
+        WHERE id = #{id}
+        FOR UPDATE
+    </select>
+
+    <select id="findNotDeletedViewById" resultMap="bookViewMap">
+        SELECT b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version,
+        COUNT(r.id) AS unreturned_quantity
+        FROM books AS b
+        LEFT JOIN borrow_records AS r
+        ON b.id = r.book_id AND r.returned_at IS NULL
+        WHERE b.deleted = 0 AND b.id = #{id}
+        GROUP BY b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version
+    </select>
+
+    <select id="findAllNotDeletedViews" resultMap="bookViewMap">
+        SELECT b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version,
+        COUNT(r.id) AS unreturned_quantity
+        FROM books AS b
+        LEFT JOIN borrow_records AS r
+        ON b.id = r.book_id AND r.returned_at IS NULL
+        WHERE b.deleted = 0
+        GROUP BY b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version
+        ORDER BY b.id ASC
+    </select>
+
+    <select id="searchNotDeletedViewsByTitle" resultMap="bookViewMap">
+        SELECT b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version,
+        COUNT(r.id) AS unreturned_quantity
+        FROM books AS b
+        LEFT JOIN borrow_records AS r
+        ON b.id = r.book_id AND r.returned_at IS NULL
+        WHERE b.deleted = 0
+        AND LOWER(b.title) LIKE LOWER(#{keyword}) ESCAPE '!'
+        GROUP BY b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version
+        ORDER BY b.id ASC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO books (title, author, price, total_quantity)
+        VALUES (#{title}, #{author}, #{price}, #{totalQuantity})
+    </insert>
+
+    <update id="update">
+        UPDATE books
+        SET title = #{title}, author = #{author}, price = #{price},
+        total_quantity = #{totalQuantity}, version = version + 1
+        WHERE id = #{id} AND deleted = 0 AND version = #{expectedVersion}
+    </update>
+
+    <update id="markDeleted">
+        UPDATE books
+        SET deleted = 1, version = version + 1
+        WHERE id = #{id} AND deleted = 0 AND version = #{expectedVersion}
+    </update>
+</mapper>
+</mapper>

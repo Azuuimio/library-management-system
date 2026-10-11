@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.library.mapper.BorrowRecordMapper">
+    <resultMap id="borrowRecordMap" type="com.example.library.model.BorrowRecord" autoMapping="false">
+        <id property="id" column="record_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="bookId" column="book_id"/>
+        <result property="borrowedAt" column="borrowed_at"/>
+        <result property="returnedAt" column="returned_at"/>
+    </resultMap>
+
+    <resultMap id="borrowRecordViewMap" type="com.example.library.model.view.BorrowRecordView"
+               autoMapping="false">
+        <constructor>
+            <arg name="borrowRecord" javaType="com.example.library.model.BorrowRecord"
+                 resultMap="borrowRecordMap"/>
+            <arg name="username" javaType="java.lang.String" column="username"/>
+            <arg name="bookTitle" javaType="java.lang.String" column="book_title"/>
+            <arg name="bookDeleted" javaType="_boolean" column="book_deleted"/>
+        </constructor>
+        <id property="borrowRecord.id" column="record_id" javaType="_long"/>
+    </resultMap>
+
+    <select id="findById" resultMap="borrowRecordMap">
+        SELECT id AS record_id, user_id, book_id, borrowed_at, returned_at
+        FROM borrow_records
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAllViews" resultMap="borrowRecordViewMap">
+        SELECT r.id AS record_id, r.user_id, r.book_id, r.borrowed_at, r.returned_at,
+        u.username, b.title AS book_title, b.deleted AS book_deleted
+        FROM borrow_records AS r
+        JOIN users AS u ON u.id = r.user_id
+        JOIN books AS b ON b.id = r.book_id
+        ORDER BY r.id ASC
+    </select>
+
+    <select id="findViewsByUserId" resultMap="borrowRecordViewMap">
+        SELECT r.id AS record_id, r.user_id, r.book_id, r.borrowed_at, r.returned_at,
+        u.username, b.title AS book_title, b.deleted AS book_deleted
+        FROM borrow_records AS r
+        JOIN users AS u ON u.id = r.user_id
+        JOIN books AS b ON b.id = r.book_id
+        WHERE r.user_id = #{userId}
+        ORDER BY r.id ASC
+    </select>
+
+    <select id="countUnreturnedByBookId" resultType="long">
+        SELECT COUNT(*)
+        FROM borrow_records
+        WHERE book_id = #{bookId} AND returned_at IS NULL
+    </select>
+
+    <select id="existsUnreturned" resultType="boolean">
+        SELECT EXISTS (
+        SELECT 1
+        FROM borrow_records
+        WHERE user_id = #{userId} AND book_id = #{bookId} AND returned_at IS NULL
+        )
+    </select>
+
+    <insert id="insert" parameterType="com.example.library.model.BorrowRecord"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO borrow_records (user_id, book_id, borrowed_at)
+        VALUES (#{userId}, #{bookId}, #{borrowedAt})
+    </insert>
+
+    <update id="markReturnedIfUnreturned">
+        UPDATE borrow_records
+        SET returned_at = #{returnedAt}
+        WHERE id = #{id} AND user_id = #{userId} AND returned_at IS NULL
+    </update>
+</mapper>
