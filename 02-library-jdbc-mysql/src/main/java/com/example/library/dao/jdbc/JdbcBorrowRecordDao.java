@@ -131,10 +131,11 @@ public final class JdbcBorrowRecordDao implements BorrowRecordDao {
     @Override
     public boolean existsUnreturned(long userId, long bookId) {
         String sql = """
-                SELECT 1
-                FROM borrow_records
-                WHERE user_id = ? AND book_id = ? AND returned_at IS NULL
-                LIMIT 1
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM borrow_records
+                    WHERE user_id = ? AND book_id = ? AND returned_at IS NULL
+                )
                 """;
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userId);
