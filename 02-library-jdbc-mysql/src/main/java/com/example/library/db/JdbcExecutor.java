@@ -40,7 +40,7 @@ public final class JdbcExecutor {
      *
      * @param work 只执行查询的回调，须在返回前读完并映射结果
      * @param <T> 查询结果类型
-     * @return 已脱离连接的查询结果
+     * @return 已读取并映射完成的查询结果
      * @throws BusinessException 业务检查未通过，且连接关闭正常
      * @throws StorageException 查询、连接创建或关闭失败
      */
@@ -67,7 +67,7 @@ public final class JdbcExecutor {
      *
      * @param work 使用同一连接的业务回调，不得等待用户输入
      * @param <T> 回调结果类型
-     * @return 事务提交且连接关闭后的业务结果
+     * @return 事务提交后的业务结果
      * @throws BusinessException 业务检查未通过，且回滚和关闭正常
      * @throws StorageException 数据库操作、事务提交或回滚失败，或数据库连接创建、配置、关闭失败
      */
