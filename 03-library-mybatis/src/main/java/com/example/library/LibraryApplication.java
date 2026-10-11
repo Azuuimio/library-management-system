@@ -1,6 +1,5 @@
 package com.example.library;
 
-import com.example.library.db.ConnectionFactory;
 import com.example.library.db.JdbcExecutor;
 import com.example.library.exception.StorageException;
 import com.example.library.service.BookService;
