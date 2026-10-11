@@ -1,11 +1,5 @@
 package com.example.library.db;
 
-import com.example.library.dao.BookDao;
-import com.example.library.dao.BorrowRecordDao;
-import com.example.library.dao.UserDao;
-import com.example.library.dao.jdbc.JdbcBookDao;
-import com.example.library.dao.jdbc.JdbcBorrowRecordDao;
-import com.example.library.dao.jdbc.JdbcUserDao;
 import com.example.library.exception.BusinessException;
 import com.example.library.exception.StorageException;
 import org.apache.ibatis.exceptions.PersistenceException;
@@ -14,8 +8,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.function.Function;
 
 /**
@@ -28,8 +20,8 @@ import java.util.function.Function;
 public final class MybatisExecutor {
     private final SqlSessionFactory sqlSessionFactory;
 
-    public MybatisExecutor(SqlSessionFactory sessionFactory) {
-        this.sqlSessionFactory = sessionFactory;
+    public MybatisExecutor(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
 
     /**

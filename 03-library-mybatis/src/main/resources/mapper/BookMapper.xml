@@ -79,4 +79,3 @@
         WHERE id = #{id} AND deleted = 0 AND version = #{expectedVersion}
     </update>
 </mapper>
-</mapper>

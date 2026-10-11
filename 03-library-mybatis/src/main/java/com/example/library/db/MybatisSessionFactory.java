@@ -11,10 +11,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * 从环境变量读取连接配置，加载 MyBatis 配置和 Mapper XML。
+ */
 public final class MybatisSessionFactory {
     private MybatisSessionFactory() {
     }
 
+    /**
+     * 创建可共享的会话工厂，此时尚未连接数据库。
+     *
+     * @return 已加载全部 Mapper 的会话工厂
+     * @throws StorageException 连接配置缺失或无效，或 MyBatis 配置加载失败
+     */
     public static SqlSessionFactory create() {
         String url = requireEnvironment("LIBRARY_DB_URL");
         String user = requireEnvironment("LIBRARY_DB_USER");

@@ -12,7 +12,7 @@ public final class User {
     /** 预制账号名称。 */
     private String username;
 
-    /** 用户角色。 */
+    /** 用户角色，决定登录后显示的菜单。 */
     private Role role;
 
     public User() {

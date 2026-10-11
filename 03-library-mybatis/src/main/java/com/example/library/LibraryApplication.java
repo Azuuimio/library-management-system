@@ -1,6 +1,7 @@
 package com.example.library;
 
 import com.example.library.db.MybatisExecutor;
+import com.example.library.db.MybatisSessionFactory;
 import com.example.library.exception.StorageException;
 import com.example.library.service.BookService;
 import com.example.library.service.BorrowRecordService;
@@ -28,7 +29,7 @@ public final class LibraryApplication {
     public static void main(String[] args) {
         ConsoleIo io = new ConsoleIo();
         try {
-            MybatisExecutor executor = new MybatisExecutor(new ConnectionFactory());
+            MybatisExecutor executor = new MybatisExecutor(MybatisSessionFactory.create());
             UserService userService = new UserService(executor);
             BookService bookService = new BookService(executor);
             BorrowRecordService borrowRecordService = new BorrowRecordService(executor);
