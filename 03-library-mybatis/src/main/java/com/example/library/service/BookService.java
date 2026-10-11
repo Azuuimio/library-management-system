@@ -1,9 +1,10 @@
 package com.example.library.service;
 
-import com.example.library.dao.BookDao;
-import com.example.library.db.JdbcExecutor;
+import com.example.library.db.MybatisExecutor;
 import com.example.library.exception.BusinessException;
 import com.example.library.exception.StorageException;
+import com.example.library.mapper.BookMapper;
+import com.example.library.mapper.BorrowRecordMapper;
 import com.example.library.model.Book;
 import com.example.library.model.view.BookView;
 import com.example.library.validation.BookValidator;
@@ -12,15 +13,15 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * 处理图书的新增、修改、删除和查询，展示结果中的未归还数量由 DAO 查询计算。
+ * 处理图书的新增、修改、删除和查询，展示结果中的未归还数量由 Mapper 查询计算。
  *
  * <p>删除图书和减少总数量前会检查借阅记录。
  * 管理员入口由控制台菜单提供，此类不检查调用者的角色。
  */
 public final class BookService {
-    private final JdbcExecutor executor;
+    private final MybatisExecutor executor;
 
-    public BookService(JdbcExecutor executor) {
+    public BookService(MybatisExecutor executor) {
         this.executor = executor;
     }
 
@@ -40,8 +41,17 @@ public final class BookService {
         String normalizedAuthor = BookValidator.validateAndNormalizeText(author, "作者");
         BigDecimal normalizedPrice = BookValidator.validateAndNormalizePrice(price);
         int validatedQuantity = BookValidator.validateQuantity(totalQuantity);
-        return executor.executeInTransaction(context -> context.bookDao().insert(
-                normalizedTitle, normalizedAuthor, normalizedPrice, validatedQuantity));
+        return executor.executeInTransaction(session -> {
+            Book book = new Book(0, normalizedTitle, normalizedAuthor, normalizedPrice,
+                    validatedQuantity, false, 0);
+            if (session.getMapper(BookMapper.class).insert(book) != 1) {
+                throw new StorageException("新增图书的受影响行数异常");
+            }
+            if (book.getId() <= 0) {
+                throw new StorageException("新增图书后未取得数据库生成的编号");
+            }
+            return book;
+        });
     }
 
     /**
@@ -56,15 +66,17 @@ public final class BookService {
      * @throws com.example.library.exception.StorageException 数据查询或保存删除状态失败，或数据库连接、事务处理失败
      */
     public void delete(long bookId, long expectedVersion) {
-        executor.executeInTransaction(context -> {
-            Book book = findNotDeletedByIdForUpdate(context.bookDao(), bookId);
+        executor.executeInTransaction(session -> {
+            BookMapper bookMapper = session.getMapper(BookMapper.class);
+            BorrowRecordMapper borrowRecordMapper = session.getMapper(BorrowRecordMapper.class);
+            Book book = findNotDeletedByIdForUpdate(bookMapper, bookId);
             if (book.getVersion() != expectedVersion) {
                 throw new BusinessException("图书信息已变化，请重新查看后删除");
             }
-            if (context.borrowRecordDao().countUnreturnedByBookId(bookId) != 0) {
+            if (borrowRecordMapper.countUnreturnedByBookId(bookId) != 0) {
                 throw new BusinessException("该图书仍有未归还记录，不能删除");
             }
-            if (context.bookDao().markDeleted(bookId, expectedVersion) != 1) {
+            if (bookMapper.markDeleted(bookId, expectedVersion) != 1) {
                 throw new StorageException("删除图书的受影响行数异常");
             }
             return null;
@@ -92,15 +104,17 @@ public final class BookService {
         String normalizedAuthor = BookValidator.validateAndNormalizeText(author, "作者");
         BigDecimal normalizedPrice = BookValidator.validateAndNormalizePrice(price);
         int validatedQuantity = BookValidator.validateQuantity(totalQuantity);
-        executor.executeInTransaction(context -> {
-            Book book = findNotDeletedByIdForUpdate(context.bookDao(), bookId);
+        executor.executeInTransaction(session -> {
+            BookMapper bookMapper = session.getMapper(BookMapper.class);
+            BorrowRecordMapper borrowRecordMapper = session.getMapper(BorrowRecordMapper.class);
+            Book book = findNotDeletedByIdForUpdate(bookMapper, bookId);
             if (book.getVersion() != expectedVersion) {
                 throw new BusinessException("图书信息已变化，请重新查看后修改");
             }
-            if (validatedQuantity < context.borrowRecordDao().countUnreturnedByBookId(bookId)) {
+            if (validatedQuantity < borrowRecordMapper.countUnreturnedByBookId(bookId)) {
                 throw new BusinessException("总数不能小于当前未归还数量");
             }
-            if (context.bookDao().update(bookId, normalizedTitle, normalizedAuthor,
+            if (bookMapper.update(bookId, normalizedTitle, normalizedAuthor,
                     normalizedPrice, validatedQuantity, expectedVersion) != 1) {
                 throw new StorageException("修改图书的受影响行数异常");
             }
@@ -117,25 +131,26 @@ public final class BookService {
      * @throws com.example.library.exception.StorageException 查询图书展示信息或数据库连接处理失败
      */
     public BookView findById(long bookId) {
-        return executor.executeQuery(context -> context.bookDao().findNotDeletedViewById(bookId)
+        return executor.executeQuery(session -> session.getMapper(BookMapper.class).findNotDeletedViewById(bookId)
                 .orElseThrow(() -> new BusinessException("图书不存在或已删除")));
     }
 
     /**
      * 查询全部未删除图书，并为每本图书附上当前未归还数量。
      *
-     * @return 图书展示信息列表；没有未删除图书时返回空列表
+     * @return 不可修改的图书展示信息列表；没有未删除图书时返回空列表
      * @throws com.example.library.exception.StorageException 查询图书展示信息或数据库连接处理失败
      */
     public List<BookView> findAllNotDeleted() {
-        return executor.executeQuery(context -> context.bookDao().findAllNotDeletedViews());
+        return executor.executeQuery(session ->
+                List.copyOf(session.getMapper(BookMapper.class).findAllNotDeletedViews()));
     }
 
     /**
      * 查询书名包含关键词的未删除图书，匹配时忽略大小写。
      *
      * @param keyword 书名关键词，查询前会去除首尾空白
-     * @return 包含当前未归还数量的图书展示信息；没有匹配项时返回空列表
+     * @return 不可修改的图书展示信息列表，包含当前未归还数量；没有匹配项时返回空列表
      * @throws BusinessException 关键词为 {@code null}、空字符串或仅包含空白字符
      * @throws com.example.library.exception.StorageException 查询图书展示信息或数据库连接处理失败
      */
@@ -143,11 +158,16 @@ public final class BookService {
         if (keyword == null || keyword.isBlank()) {
             throw new BusinessException("搜索关键词不能为空");
         }
-        return executor.executeQuery(context -> context.bookDao().searchNotDeletedViewsByTitle(keyword.strip()));
+        String escapedKeyword = keyword.strip()
+                .replace("!", "!!")
+                .replace("%", "!%")
+                .replace("_", "!_");
+        return executor.executeQuery(session -> List.copyOf(session.getMapper(BookMapper.class)
+                .searchNotDeletedViewsByTitle("%" + escapedKeyword + "%")));
     }
 
-    private Book findNotDeletedByIdForUpdate(BookDao bookDao, long bookId) {
-        return bookDao.findByIdForUpdate(bookId).filter(book -> !book.isDeleted())
+    private Book findNotDeletedByIdForUpdate(BookMapper bookMapper, long bookId) {
+        return bookMapper.findByIdForUpdate(bookId).filter(book -> !book.isDeleted())
                 .orElseThrow(() -> new BusinessException("图书不存在或已删除"));
     }
 }

@@ -1,16 +1,17 @@
 package com.example.library.service;
 
-import com.example.library.db.JdbcExecutor;
+import com.example.library.db.MybatisExecutor;
 import com.example.library.exception.BusinessException;
+import com.example.library.mapper.UserMapper;
 import com.example.library.model.User;
 
 /**
  * 根据预制账号名称完成登录，本阶段不校验密码。
  */
 public final class UserService {
-    private final JdbcExecutor executor;
+    private final MybatisExecutor executor;
 
-    public UserService(JdbcExecutor executor) {
+    public UserService(MybatisExecutor executor) {
         this.executor = executor;
     }
 
@@ -26,7 +27,7 @@ public final class UserService {
         if (username == null || username.isBlank()) {
             throw new BusinessException("账号不能为空");
         }
-        return executor.executeQuery(context -> context.userDao().findByUsername(username.strip())
+        return executor.executeQuery(session -> session.getMapper(UserMapper.class).findByUsername(username.strip())
                 .orElseThrow(() -> new BusinessException("账号不存在，请输入预制账号")));
     }
 }
