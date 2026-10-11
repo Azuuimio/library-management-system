@@ -6,7 +6,6 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -44,7 +43,6 @@ public final class MybatisSessionFactory {
             throw new StorageException("MyBatis 配置加载失败", exception);
         }
     }
-
 
     private static String requireEnvironment(String name) {
         String value = System.getenv(name);

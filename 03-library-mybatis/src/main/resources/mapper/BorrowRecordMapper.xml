@@ -30,8 +30,14 @@
     </select>
 
     <select id="findAllViews" resultMap="borrowRecordViewMap">
-        SELECT r.id AS record_id, r.user_id, r.book_id, r.borrowed_at, r.returned_at,
-        u.username, b.title AS book_title, b.deleted AS book_deleted
+        SELECT r.id AS record_id,
+               r.user_id,
+               r.book_id,
+               r.borrowed_at,
+               r.returned_at,
+               u.username,
+               b.title AS book_title,
+               b.deleted AS book_deleted
         FROM borrow_records AS r
         JOIN users AS u ON u.id = r.user_id
         JOIN books AS b ON b.id = r.book_id
@@ -39,8 +45,14 @@
     </select>
 
     <select id="findViewsByUserId" resultMap="borrowRecordViewMap">
-        SELECT r.id AS record_id, r.user_id, r.book_id, r.borrowed_at, r.returned_at,
-        u.username, b.title AS book_title, b.deleted AS book_deleted
+        SELECT r.id AS record_id,
+               r.user_id,
+               r.book_id,
+               r.borrowed_at,
+               r.returned_at,
+               u.username,
+               b.title AS book_title,
+               b.deleted AS book_deleted
         FROM borrow_records AS r
         JOIN users AS u ON u.id = r.user_id
         JOIN books AS b ON b.id = r.book_id
@@ -56,9 +68,9 @@
 
     <select id="existsUnreturned" resultType="boolean">
         SELECT EXISTS (
-        SELECT 1
-        FROM borrow_records
-        WHERE user_id = #{userId} AND book_id = #{bookId} AND returned_at IS NULL
+            SELECT 1
+            FROM borrow_records
+            WHERE user_id = #{userId} AND book_id = #{bookId} AND returned_at IS NULL
         )
     </select>
 

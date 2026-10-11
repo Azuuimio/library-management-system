@@ -13,7 +13,8 @@ import java.util.function.Function;
 /**
  * 为每次回调创建独立会话，统一处理事务提交、回滚与会话关闭。
  *
- * <p>使用 JDBC 事务配置，通过 SqlSession 控制事务，由 MyBatis 管理连接。
+ * <p>使用 JDBC 事务配置，执行器通过 SqlSession 提交、回滚和关闭会话。
+ * 数据库连接由 MyBatis 获取和关闭。
  * MyBatis 在关闭事务时捕获的 SQLException 仅记录日志，不向调用方抛出。
  * 不支持嵌套事务；回调内不能调用会自行开启事务的业务方法，也不能等待用户输入。
  */
@@ -40,7 +41,6 @@ public final class MybatisExecutor {
             throw new StorageException("数据库查询或会话处理失败", exception);
         }
     }
-
 
     /**
      * 在 READ COMMITTED 事务中执行业务，成功则提交，失败则尝试回滚。

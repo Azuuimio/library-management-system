@@ -29,35 +29,71 @@
     </select>
 
     <select id="findNotDeletedViewById" resultMap="bookViewMap">
-        SELECT b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version,
-        COUNT(r.id) AS unreturned_quantity
+        SELECT b.id,
+               b.title,
+               b.author,
+               b.price,
+               b.total_quantity,
+               b.deleted,
+               b.version,
+               COUNT(r.id) AS unreturned_quantity
         FROM books AS b
         LEFT JOIN borrow_records AS r
-        ON b.id = r.book_id AND r.returned_at IS NULL
+            ON b.id = r.book_id AND r.returned_at IS NULL
         WHERE b.deleted = 0 AND b.id = #{id}
-        GROUP BY b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version
+        GROUP BY b.id,
+                 b.title,
+                 b.author,
+                 b.price,
+                 b.total_quantity,
+                 b.deleted,
+                 b.version
     </select>
 
     <select id="findAllNotDeletedViews" resultMap="bookViewMap">
-        SELECT b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version,
-        COUNT(r.id) AS unreturned_quantity
+        SELECT b.id,
+               b.title,
+               b.author,
+               b.price,
+               b.total_quantity,
+               b.deleted,
+               b.version,
+               COUNT(r.id) AS unreturned_quantity
         FROM books AS b
         LEFT JOIN borrow_records AS r
-        ON b.id = r.book_id AND r.returned_at IS NULL
+            ON b.id = r.book_id AND r.returned_at IS NULL
         WHERE b.deleted = 0
-        GROUP BY b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version
+        GROUP BY b.id,
+                 b.title,
+                 b.author,
+                 b.price,
+                 b.total_quantity,
+                 b.deleted,
+                 b.version
         ORDER BY b.id ASC
     </select>
 
     <select id="searchNotDeletedViewsByTitle" resultMap="bookViewMap">
-        SELECT b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version,
-        COUNT(r.id) AS unreturned_quantity
+        SELECT b.id,
+               b.title,
+               b.author,
+               b.price,
+               b.total_quantity,
+               b.deleted,
+               b.version,
+               COUNT(r.id) AS unreturned_quantity
         FROM books AS b
         LEFT JOIN borrow_records AS r
-        ON b.id = r.book_id AND r.returned_at IS NULL
+            ON b.id = r.book_id AND r.returned_at IS NULL
         WHERE b.deleted = 0
-        AND LOWER(b.title) LIKE LOWER(#{keyword}) ESCAPE '!'
-        GROUP BY b.id, b.title, b.author, b.price, b.total_quantity, b.deleted, b.version
+          AND LOWER(b.title) LIKE LOWER(#{keyword}) ESCAPE '!'
+        GROUP BY b.id,
+                 b.title,
+                 b.author,
+                 b.price,
+                 b.total_quantity,
+                 b.deleted,
+                 b.version
         ORDER BY b.id ASC
     </select>
 
@@ -69,7 +105,7 @@
     <update id="update">
         UPDATE books
         SET title = #{title}, author = #{author}, price = #{price},
-        total_quantity = #{totalQuantity}, version = version + 1
+            total_quantity = #{totalQuantity}, version = version + 1
         WHERE id = #{id} AND deleted = 0 AND version = #{expectedVersion}
     </update>
 
