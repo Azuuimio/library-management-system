@@ -6,16 +6,10 @@ Java SE + MyBatis + MySQL + Maven
 
 ## 功能说明
 
-**已完成功能**
-
-- 实现基础的图书管理业务功能。
+- 实现了基础的图书管理业务功能。
 - 使用 MyBatis 访问 MySQL 实现数据持久化。
 - 支持并发读写。
-
-**本阶段限制**
-
-- 仅提供控制台交互界面。
-- 使用无密码预制账号，暂未提供注册及面向用户的账号管理功能。
+- 使用无密码预制账号，不提供注册及面向用户的账号管理功能。
 
 预制账号如下：
 
@@ -24,10 +18,6 @@ Java SE + MyBatis + MySQL + Maven
 | admin    | 管理员 |
 | reader1  | 读者   |
 | reader2  | 读者   |
-
-## 运行示例
-
-<img width="867" height="464" alt="屏幕截图 2026-10-02 114534" src="https://github.com/user-attachments/assets/8ff11bf8-8a43-4001-8af7-bdcdf05cb4e2" />
 
 ## 开发环境
 

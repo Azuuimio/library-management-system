@@ -1,25 +1,15 @@
-# Java 全栈练习项目：图书管理系统
+# Java + MySQL 练习项目：图书管理系统
 
-用同一个图书管理系统逐步引入新技术。
+仓库包含三个可独立运行的完整版本，使用相同的核心业务，不同的数据持久化方案。
 
-## 阶段规划
+## 版本与目录
 
-| 阶段 | 目录 | 新增技术 |
-| :--- | :--- | :--- |
-| 01 | 01-library-java | Java SE |
-| 02 | 02-library-jdbc-mysql | JDBC + MySQL |
-| 03 | 03-library-mybatis | MyBatis |
-| 04 | 04-library-mybatis-plus | MyBatis-Plus |
-| 05 | 05-library-spring-boot | Spring Boot |
-| 06 | 06-library-vue3-fullstack | Vue 3 全栈 |
+| 目录 | 技术栈 | 数据存储 | 并发读写 |
+| --- | --- | --- | --- |
+| [01-library-java](01-library-java/) | Java SE | CSV 文件 | 不支持 |
+| [02-library-jdbc-mysql](02-library-jdbc-mysql/) | Java SE + JDBC + MySQL + Maven | MySQL | 支持 |
+| [03-library-mybatis](03-library-mybatis/) | Java SE + MyBatis + MySQL + Maven | MySQL | 支持 |
 
-每个阶段都保留成一个可以独立运行的完整版本。
+## 运行示例
 
-## 进度
-
-已完成阶段：01，02
-
-## 各阶段约定
-
-- 注册功能：01~04 阶段使用无密码预制账号；从 05 阶段开始引入完整注册功能
-- Maven：从 02 阶段开始引入
+<img width="867" height="464" alt="屏幕截图 2026-10-02 114534" src="https://github.com/user-attachments/assets/8ff11bf8-8a43-4001-8af7-bdcdf05cb4e2" />
